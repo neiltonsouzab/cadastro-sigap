@@ -19,7 +19,7 @@ export default class CreateUsersTokens1610036385868
             name: 'token',
             type: 'varchar',
             generationStrategy: 'uuid',
-            default: 'uuid()',
+            // default: 'uuid()',
           },
           {
             name: 'user_id',
