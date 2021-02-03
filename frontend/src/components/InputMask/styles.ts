@@ -1,6 +1,8 @@
 import styled from 'styled-components';
 
-export const Container = styled.div`
+export const Container = styled.div``;
+
+export const Content = styled.div`
   margin-top: 10px;
   height: 38px;
 
@@ -30,4 +32,15 @@ export const Container = styled.div`
   svg {
     margin-right: 10px;
   }
+`;
+
+export const ErrorMessage = styled.span`
+  display: block;
+  margin-top: 4px;
+
+  font-family: 'Roboto Condensed';
+  font-size: 14px;
+  font-weight: bold;
+
+  color: #ff8266;
 `;

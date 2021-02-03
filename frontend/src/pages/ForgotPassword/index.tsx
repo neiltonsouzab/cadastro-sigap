@@ -6,8 +6,6 @@ import InputText from '../../components/InputText';
 
 import {
   Container,
-  FormSection,
-  BackgroundSection,
   Title,
   SubTitle,
   Form,
@@ -20,27 +18,23 @@ const ForgotPassword: React.FC = () => {
 
   return (
     <Container>
-      <FormSection>
-        <Title>SISTEMA DE CADASTRO</Title>
-        <SubTitle>SIGAP</SubTitle>
+      <Title>SISTEMA DE CADASTRO</Title>
+      <SubTitle>SIGAP</SubTitle>
 
-        <Form ref={signFormRef} onSubmit={() => console.log('Submit')}>
-          <FormTitle>ESQUECI MINHA SENHA</FormTitle>
+      <Form ref={signFormRef} onSubmit={() => console.log('Submit')}>
+        <FormTitle>ESQUECI MINHA SENHA</FormTitle>
 
-          <InputText
-            name="email"
-            type="email"
-            placeholder="EMAIL"
-            icon={FaEnvelope}
-          />
+        <InputText
+          name="email"
+          type="email"
+          placeholder="EMAIL"
+          icon={FaEnvelope}
+        />
 
-          <Button label="ENVIAR" />
+        <Button label="ENVIAR" />
 
-          <BackToSignInLink href="#">Voltar para Login</BackToSignInLink>
-        </Form>
-      </FormSection>
-
-      <BackgroundSection />
+        <BackToSignInLink to="/">Voltar para Login</BackToSignInLink>
+      </Form>
     </Container>
   );
 };

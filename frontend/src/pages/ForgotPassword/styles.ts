@@ -1,31 +1,12 @@
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+
 import { Form as FormUnform } from '@unform/web';
 
-import cpaImg from '../../assets/cpa.jpg';
-
 export const Container = styled.div`
-  height: 100%;
-
-  display: flex;
-  flex-direction: row;
-`;
-
-export const FormSection = styled.section`
   display: flex;
   flex-direction: column;
   align-items: center;
-
-  flex: 1;
-
-  margin-top: 80px;
-`;
-
-export const BackgroundSection = styled.section`
-  width: 50%;
-  background: #000;
-
-  background: url(${cpaImg}) center center no-repeat;
-  box-shadow: inset 124px 0px 50px #ffffff;
 `;
 
 export const Title = styled.h1`
@@ -59,7 +40,7 @@ export const FormTitle = styled.h3`
   color: #fff;
 `;
 
-export const BackToSignInLink = styled.a`
+export const BackToSignInLink = styled(Link)`
   display: block;
 
   text-decoration: none;
@@ -72,6 +53,8 @@ export const BackToSignInLink = styled.a`
   font-weight: bold;
 
   color: #f98b0c;
+
+  transition: filter 0.5s;
 
   &:hover {
     filter: brightness(0.9);

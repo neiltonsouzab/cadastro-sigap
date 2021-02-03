@@ -3,7 +3,7 @@ import { IconBaseProps } from 'react-icons/lib';
 import ReactInputMask, { Props as ReactInputMaskProps } from 'react-input-mask';
 import { useField } from '@unform/core';
 
-import { Container } from './styles';
+import { Container, Content, ErrorMessage } from './styles';
 
 interface InputMaskProps extends ReactInputMaskProps {
   name: string;
@@ -42,14 +42,23 @@ const InputMask: React.FC<InputMaskProps> = ({ name, icon: Icon, ...rest }) => {
 
   return (
     <Container>
-      <ReactInputMask
-        ref={inputRef}
-        defaultValue={defaultValue}
-        onFocus={handleInputFocus}
-        onBlur={handleInputBlur}
-        {...rest}
-      />
-      <Icon size={16} color={isFocused || isFilled ? '#F98B0C' : '#c9c9c0'} />
+      <Content>
+        <ReactInputMask
+          ref={inputRef}
+          defaultValue={defaultValue}
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
+          {...rest}
+        />
+        <Icon
+          size={16}
+          color={
+            isFocused || isFilled ? '#F98B0C' : error ? '#ff8266' : '#c9c9c0'
+          }
+        />
+      </Content>
+
+      {!!error && <ErrorMessage>{error}</ErrorMessage>}
     </Container>
   );
 };

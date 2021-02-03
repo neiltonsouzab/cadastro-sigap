@@ -8,7 +8,7 @@ import React, {
 import { IconBaseProps } from 'react-icons';
 import { useField } from '@unform/core';
 
-import { Container } from './styles';
+import { Container, Content, ErrorMessage } from './styles';
 
 interface InputTextProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
@@ -16,7 +16,6 @@ interface InputTextProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const InputText: React.FC<InputTextProps> = ({ name, icon: Icon, ...rest }) => {
-  console.log(name);
   const inputRef = useRef<HTMLInputElement>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [isFilled, setIsFilled] = useState(false);
@@ -42,15 +41,24 @@ const InputText: React.FC<InputTextProps> = ({ name, icon: Icon, ...rest }) => {
 
   return (
     <Container>
-      <input
-        ref={inputRef}
-        defaultValue={defaultValue}
-        onFocus={handleInputFocus}
-        onBlur={handleInputBlur}
-        {...rest}
-      />
+      <Content>
+        <input
+          ref={inputRef}
+          defaultValue={defaultValue}
+          onFocus={handleInputFocus}
+          onBlur={handleInputBlur}
+          {...rest}
+        />
 
-      <Icon size={16} color={isFocused || isFilled ? '#F98B0C' : '#c9c9c0'} />
+        <Icon
+          size={16}
+          color={
+            isFocused || isFilled ? '#F98B0C' : error ? '#ff8266' : '#c9c9c0'
+          }
+        />
+      </Content>
+
+      {!!error && <ErrorMessage>{error}</ErrorMessage>}
     </Container>
   );
 };
