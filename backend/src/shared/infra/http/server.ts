@@ -2,6 +2,7 @@ import 'reflect-metadata';
 import 'dotenv/config';
 
 import express from 'express';
+import cors from 'cors';
 import { errors as celebrateErrors } from 'celebrate';
 import 'express-async-errors';
 
@@ -13,6 +14,7 @@ import errors from '../../errors'; // Error interceptor
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 app.use(routes);
 app.use(celebrateErrors());

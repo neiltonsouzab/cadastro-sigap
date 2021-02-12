@@ -1,106 +1,110 @@
-import React, { useCallback, useRef } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
-import { FormHandles } from '@unform/core';
-import { FaIdCard, FaLock } from 'react-icons/fa';
+import { useFormik } from 'formik';
+import { Button, Flex, Heading, Link, VStack } from '@chakra-ui/react';
+import { FaUserAlt, FaLock } from 'react-icons/fa';
 import * as Yup from 'yup';
 
-import { useToast } from '../../hooks/toast';
 import { useAuth } from '../../hooks/auth';
-import getValidationErrors from '../../utils/getValidationErrors';
 
-import Button from '../../components/Button';
 import InputText from '../../components/InputText';
 import InputMask from '../../components/InputMask';
 
-import {
-  Container,
-  Title,
-  SubTitle,
-  Form,
-  FormTitle,
-  ForgotPasswordLink,
-} from './styles';
-
-interface SignInFormData {
-  cpf: string;
-  password: string;
-}
+const validationSchema = Yup.object({
+  cpf: Yup.string().required('CPF obrigatório.'),
+  password: Yup.string().required('Senha obrigatória.'),
+});
 
 const SignIn: React.FC = () => {
   const history = useHistory();
-  const signFormRef = useRef<FormHandles>(null);
-
-  const { addToast } = useToast();
   const { signIn } = useAuth();
 
-  const handleSubmit = useCallback(
-    async (data: SignInFormData) => {
-      try {
-        signFormRef.current?.setErrors({});
-
-        const schema = Yup.object().shape({
-          cpf: Yup.string().required('CPF obrigatório.'),
-          password: Yup.string().required('Senha obrigatória'),
-        });
-
-        await schema.validate(data, {
-          abortEarly: false,
-        });
-
-        await signIn({
-          cpf: data.cpf,
-          password: data.password,
-        });
-
-        history.push('/home');
-      } catch (err) {
-        if (err instanceof Yup.ValidationError) {
-          const errors = getValidationErrors(err);
-          signFormRef.current?.setErrors(errors);
-
-          return;
-        }
-
-        addToast({
-          type: 'error',
-          title: 'Há algo de errado',
-          description:
-            'Ocorreu um erro ao fazer login, cheque suas credenciais.',
-        });
-      }
+  const formik = useFormik({
+    initialValues: {
+      cpf: '',
+      password: '',
     },
-    [addToast, signIn],
-  );
+    validationSchema,
+    onSubmit: async (data) => {
+      await signIn({
+        cpf: data.cpf,
+        password: data.password,
+      });
+
+      history.push('/users');
+    },
+  });
 
   return (
-    <Container>
-      <Title>SISTEMA DE CADASTRO</Title>
-      <SubTitle>SIGAP</SubTitle>
+    <Flex
+      as="form"
+      w="100%"
+      bg="white"
+      flexDir="column"
+      maxWidth={400}
+      padding={8}
+      borderRadius={4}
+      shadow="0 0 20px rgba(0, 0, 0, 0.05)"
+      onSubmit={(event) => {
+        event.preventDefault();
+        formik.handleSubmit();
+      }}
+    >
+      <Heading size="md" color="blue.700">
+        Fazer login
+      </Heading>
 
-      <Form ref={signFormRef} onSubmit={handleSubmit}>
-        <FormTitle>FAÇA LOGIN</FormTitle>
-
+      <VStack spacing={4} marginTop={8}>
         <InputMask
+          mask="999.999.999-99"
+          id="cpf"
           name="cpf"
           placeholder="CPF"
-          mask="999.999.999-99"
-          icon={FaIdCard}
+          icon={FaUserAlt}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          value={formik.values.cpf}
+          touched={formik.touched.cpf}
+          errors={formik.errors.cpf}
         />
-
         <InputText
+          id="password"
           name="password"
           type="password"
-          placeholder="SENHA"
+          placeholder="Senha"
           icon={FaLock}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          value={formik.values.password}
+          touched={formik.touched.password}
+          errors={formik.errors.password}
         />
+      </VStack>
 
-        <ForgotPasswordLink to="/forgot-password">
-          Esqueceu sua senha?
-        </ForgotPasswordLink>
+      <Button
+        size="lg"
+        fontSize="md"
+        color="white"
+        marginTop={4}
+        colorScheme="blue"
+        type="submit"
+        isLoading={formik.isSubmitting}
+      >
+        ENTRAR
+      </Button>
 
-        <Button label="ENTRAR" />
-      </Form>
-    </Container>
+      <Link
+        href="/forgot-password"
+        alignSelf="center"
+        mt={4}
+        fontSize="sm"
+        color="blue.500"
+        _hover={{ color: 'blue.700' }}
+        _active={{ color: 'blue.800' }}
+      >
+        Esqueceu sua senha?
+      </Link>
+    </Flex>
   );
 };
 

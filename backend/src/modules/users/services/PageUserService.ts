@@ -6,10 +6,7 @@ import IUsersRepository from '../repositories/IUsersRepository';
 
 interface IRequest {
   page: number;
-  filters: {
-    name?: string;
-    cpf?: string;
-  };
+  filter?: string;
 }
 
 @injectable()
@@ -19,10 +16,10 @@ class PageUserService {
     private usersRepository: IUsersRepository,
   ) {}
 
-  public async execute({ page, filters }: IRequest): Promise<IPage<User>> {
+  public async execute({ page, filter }: IRequest): Promise<IPage<User>> {
     const usersPage = await this.usersRepository.find({
       page,
-      filters,
+      filter,
     });
 
     return usersPage;

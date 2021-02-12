@@ -1,11 +1,10 @@
 import IPage from '@shared/models/IPage';
 import IPaginator from '@shared/models/IPaginator';
 import ICreateUserDTO from '../dtos/ICreateUserDTO';
-import IFilterUserDTO from '../dtos/IFilterUserDTO';
 import User from '../infra/typeorm/entities/User';
 
 export default interface IUsersRepository {
-  find(paginator: IPaginator<IFilterUserDTO>): Promise<IPage<User>>;
+  find(paginator: IPaginator): Promise<IPage<User>>;
   findAll(): Promise<User[]>;
   findById(id: number): Promise<User | undefined>;
   findByCpf(cpf: string): Promise<User | undefined>;

@@ -121,11 +121,18 @@ const AuthProvider: React.FC = ({ children }) => {
         ...state,
         selectedsUgs: [],
       }));
+
+      localStorage.setItem('@cadastro-sigap:selecteds_ugs', JSON.stringify([]));
     } else {
       setData((state) => ({
         ...state,
         selectedsUgs: state.user.ugs,
       }));
+
+      localStorage.setItem(
+        '@cadastro-sigap:selecteds_ugs',
+        JSON.stringify(user.ugs),
+      );
     }
   }, [data]);
 

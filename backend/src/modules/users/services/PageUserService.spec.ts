@@ -39,9 +39,6 @@ describe('ListUser', () => {
 
     const usersPage = await pageUserService.execute({
       page: 1,
-      filters: {
-        name: '',
-      },
     });
 
     expect(usersPage.pages).toEqual(1);

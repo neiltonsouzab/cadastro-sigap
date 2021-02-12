@@ -1,41 +1,52 @@
-import { FormHandles } from '@unform/core';
-import React, { useRef } from 'react';
+import React from 'react';
+import { Button, Flex, Heading, Link, VStack } from '@chakra-ui/react';
 import { FaEnvelope } from 'react-icons/fa';
-import Button from '../../components/Button';
+
 import InputText from '../../components/InputText';
 
-import {
-  Container,
-  Title,
-  SubTitle,
-  Form,
-  FormTitle,
-  BackToSignInLink,
-} from './styles';
-
 const ForgotPassword: React.FC = () => {
-  const signFormRef = useRef<FormHandles>(null);
-
   return (
-    <Container>
-      <Title>SISTEMA DE CADASTRO</Title>
-      <SubTitle>SIGAP</SubTitle>
+    <Flex
+      as="form"
+      w="100%"
+      bg="white"
+      flexDir="column"
+      maxWidth={400}
+      padding={8}
+      borderRadius={4}
+      shadow="0 0 20px rgba(0, 0, 0, 0.05)"
+    >
+      <Heading size="md" color="blue.700">
+        Esqueci minha senha
+      </Heading>
 
-      <Form ref={signFormRef} onSubmit={() => console.log('Submit')}>
-        <FormTitle>ESQUECI MINHA SENHA</FormTitle>
+      <VStack spacing={4} marginTop={8}>
+        <InputText name="email" placeholder="Email" icon={FaEnvelope} />
+      </VStack>
 
-        <InputText
-          name="email"
-          type="email"
-          placeholder="EMAIL"
-          icon={FaEnvelope}
-        />
+      <Button
+        size="lg"
+        fontSize="md"
+        color="white"
+        type="submit"
+        marginTop={4}
+        colorScheme="blue"
+      >
+        ENVIAR
+      </Button>
 
-        <Button label="ENVIAR" />
-
-        <BackToSignInLink to="/">Voltar para Login</BackToSignInLink>
-      </Form>
-    </Container>
+      <Link
+        href="/forgot-password"
+        alignSelf="center"
+        mt={4}
+        fontSize="sm"
+        color="blue.500"
+        _hover={{ color: 'blue.700' }}
+        _active={{ color: 'blue.800' }}
+      >
+        Voltar para login
+      </Link>
+    </Flex>
   );
 };
 

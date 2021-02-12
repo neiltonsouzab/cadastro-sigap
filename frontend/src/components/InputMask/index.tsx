@@ -1,66 +1,54 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { IconBaseProps } from 'react-icons/lib';
+import React from 'react';
+import {
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  Input,
+  InputProps,
+  InputGroup,
+  InputLeftElement,
+  Icon as ChakraIcon,
+} from '@chakra-ui/react';
 import ReactInputMask, { Props as ReactInputMaskProps } from 'react-input-mask';
-import { useField } from '@unform/core';
 
-import { Container, Content, ErrorMessage } from './styles';
-
-interface InputMaskProps extends ReactInputMaskProps {
+type InputTextProps = {
   name: string;
-  icon: React.ComponentType<IconBaseProps>;
-}
+  mask: string;
+  label?: string;
+  touched?: boolean;
+  errors?: string;
+  icon?: React.ElementType;
+} & InputProps &
+  ReactInputMaskProps;
 
-const InputMask: React.FC<InputMaskProps> = ({ name, icon: Icon, ...rest }) => {
-  const inputRef = useRef<any>(null);
-  const [isFocused, setIsFocused] = useState(false);
-  const [isFilled, setIsFilled] = useState(false);
-
-  const { fieldName, registerField, defaultValue, error } = useField(name);
-
-  const handleInputFocus = useCallback(() => {
-    setIsFocused(true);
-  }, []);
-
-  const handleInputBlur = useCallback(() => {
-    setIsFocused(false);
-    setIsFilled(!!inputRef.current?.value);
-  }, []);
-
-  useEffect(() => {
-    registerField({
-      name: fieldName,
-      ref: inputRef.current,
-      path: 'value',
-      setValue(ref: any, value: string) {
-        ref.setInputValue(value);
-      },
-      clearValue(ref: any) {
-        ref.setInputValue('');
-      },
-    });
-  }, [fieldName, registerField]);
-
+const InputText: React.FC<InputTextProps> = ({
+  name,
+  label,
+  touched,
+  errors,
+  icon: Icon,
+  ...rest
+}) => {
   return (
-    <Container>
-      <Content>
-        <ReactInputMask
-          ref={inputRef}
-          defaultValue={defaultValue}
-          onFocus={handleInputFocus}
-          onBlur={handleInputBlur}
+    <FormControl id={name} isInvalid={touched && !!errors}>
+      {!!label && <FormLabel color="gray.600">{label}</FormLabel>}
+      <InputGroup>
+        {Icon && (
+          <InputLeftElement pointerEvents="none">
+            <ChakraIcon color="gray.300" as={Icon} />
+          </InputLeftElement>
+        )}
+        <Input
+          as={ReactInputMask}
+          size="md"
+          id={name}
+          focusBorderColor="blue.600"
           {...rest}
         />
-        <Icon
-          size={16}
-          color={
-            isFocused || isFilled ? '#F98B0C' : error ? '#ff8266' : '#c9c9c0'
-          }
-        />
-      </Content>
-
-      {!!error && <ErrorMessage>{error}</ErrorMessage>}
-    </Container>
+      </InputGroup>
+      <FormErrorMessage>{errors}</FormErrorMessage>
+    </FormControl>
   );
 };
 
-export default InputMask;
+export default InputText;

@@ -1,4 +1,4 @@
-export default interface IPaginator<T> {
+export default interface IPaginator {
   page: number;
-  filters: T;
+  filter?: string;
 }

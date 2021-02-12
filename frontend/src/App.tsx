@@ -1,18 +1,20 @@
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-
-import GlobalStyle from './styles/global';
+import { ChakraProvider } from '@chakra-ui/react';
 
 import Routes from './routes';
 import AppProvider from './hooks';
 
+import theme from './styles/theme';
+
 const App: React.FC = () => {
   return (
     <Router>
-      <AppProvider>
-        <Routes />
-      </AppProvider>
-      <GlobalStyle />
+      <ChakraProvider resetCSS theme={theme}>
+        <AppProvider>
+          <Routes />
+        </AppProvider>
+      </ChakraProvider>
     </Router>
   );
 };

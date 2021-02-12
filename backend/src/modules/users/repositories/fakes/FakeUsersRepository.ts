@@ -1,5 +1,4 @@
 import ICreateUserDTO from '@modules/users/dtos/ICreateUserDTO';
-import IFilterUserDTO from '@modules/users/dtos/IFilterUserDTO';
 import User from '@modules/users/infra/typeorm/entities/User';
 import IPage from '@shared/models/IPage';
 import IPaginator from '@shared/models/IPaginator';
@@ -10,26 +9,20 @@ class FakeUsersRepository implements IUsersRepository {
 
   public async find({
     page,
-    filters,
-  }: IPaginator<IFilterUserDTO>): Promise<IPage<User>> {
+    filter,
+  }: IPaginator): Promise<IPage<User>> {
     const perPage = 10;
     const current = page;
 
     const skip = page * perPage - perPage;
     const take = perPage;
 
-    const { name, cpf } = filters;
-
     let data = this.users;
 
-    if (name) {
+    if (filter) {
       data = this.users.filter(user =>
-        user.name.toUpperCase().includes(name.toUpperCase()),
+        user.name.toLowerCase().includes(filter.toLowerCase()) || user.cpf.includes(filter),
       );
-    }
-
-    if (cpf) {
-      data = this.users.filter(user => user.cpf.includes(cpf));
     }
 
     const pages = Math.ceil(data.length / perPage);

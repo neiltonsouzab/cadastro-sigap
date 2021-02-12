@@ -6,18 +6,20 @@ import CreateUserService from '@modules/users/services/CreateUserService';
 import UpdateUserService from '@modules/users/services/UpdateUserService';
 import PageUserService from '@modules/users/services/PageUserService';
 
+interface IndexRequestQuery {
+  page?: number;
+  filter?: string;
+}
+
 export default class UsersController {
   public async index(request: Request, response: Response): Promise<Response> {
-    const { page = 1, cpf, name } = request.query;
+    const { page = 1, filter = '' } = request.query as IndexRequestQuery;
 
     const pageUserService = container.resolve(PageUserService);
 
     const usersPage = await pageUserService.execute({
-      page: page as number,
-      filters: {
-        cpf: cpf as string,
-        name: name as string,
-      },
+      page,
+      filter,
     });
 
     const data = usersPage.data.map(user => classToClass(user));
