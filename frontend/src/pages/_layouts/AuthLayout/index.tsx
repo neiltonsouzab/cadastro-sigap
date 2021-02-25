@@ -1,31 +1,32 @@
-import { Flex, Image } from '@chakra-ui/react';
+import { Box } from '@material-ui/core';
 import React from 'react';
 
 import cpa from '../../../assets/cpa.jpg';
-import logo from '../../../assets/logo.svg';
 
 const AuthLayout: React.FC = ({ children }) => {
   return (
-    <Flex as="main" w="100vw" h="100vh">
-      <Flex
-        as="section"
+    <Box component="main" display="flex" width="100vw" height="100vh">
+      <Box
+        component="section"
         flex={1}
-        direction="column"
+        paddingX={4}
+        paddingY={4}
+        display="flex"
         alignItems="center"
-        p="0 24px"
+        justifyContent="center"
       >
-        <Image src={logo} width={160} height={40} />
-
         {children}
-      </Flex>
+      </Box>
 
-      <Flex
-        as="section"
-        w="50%"
-        background={`url(${cpa}) center center`}
-        boxShadow="inset 100px 0px 50px #F7FAFC"
+      <Box
+        component="section"
+        width="50%"
+        boxShadow="inset 124px 0px 50px #F7FAFC"
+        style={{
+          background: `url(${cpa}) center center`,
+        }}
       />
-    </Flex>
+    </Box>
   );
 };
 

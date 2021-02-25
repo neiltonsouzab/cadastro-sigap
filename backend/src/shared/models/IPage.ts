@@ -1,5 +1,7 @@
 export default interface IPage<T> {
-  current: number;
+  page: number;
   pages: number;
+  count: number;
+  perPage: number;
   data: Array<T>;
 }

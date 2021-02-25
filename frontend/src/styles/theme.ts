@@ -1,17 +1,19 @@
-import { extendTheme } from '@chakra-ui/react';
+import { createMuiTheme } from '@material-ui/core';
 
-import { config } from './config';
-
-const theme = extendTheme({
-  ...config,
-  fonts: {
-    heading: 'Roboto',
-    body: 'Roboto',
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      light: '#5397D9',
+      main: '#3181CE',
+      dark: '#084F93',
+    },
   },
-  styles: {
-    global: {
-      body: {
-        bg: 'gray.50',
+  overrides: {
+    MuiCssBaseline: {
+      '@global': {
+        body: {
+          backgroundColor: '#F7FAFC',
+        },
       },
     },
   },

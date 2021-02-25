@@ -9,9 +9,9 @@ class FakeUsersRepository implements IUsersRepository {
 
   public async find({
     page,
+    perPage,
     filter,
   }: IPaginator): Promise<IPage<User>> {
-    const perPage = 10;
     const current = page;
 
     const skip = page * perPage - perPage;
@@ -25,13 +25,16 @@ class FakeUsersRepository implements IUsersRepository {
       );
     }
 
-    const pages = Math.ceil(data.length / perPage);
+    const count = data.length;
+    const pages = Math.ceil(count / perPage);
 
     data = data.slice(skip, take);
 
     return {
-      current,
+      page,
       pages,
+      perPage,
+      count,
       data,
     };
   }

@@ -1,41 +1,61 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
+  Typography,
   Box,
   Button,
-  Flex,
-  Heading,
+  TableContainer,
   Table,
-  Tag,
-  Tbody,
-  Td,
-  Text,
-  Th,
-  Thead,
-  Tr,
-} from '@chakra-ui/react';
-import { FaPlus } from 'react-icons/fa';
-
-import InputText from '../../../components/InputText';
-import Paginate from '../../../components/Paginate';
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  TablePagination,
+  Chip,
+  makeStyles,
+  createStyles,
+  Theme,
+  IconButton,
+} from '@material-ui/core';
+import { Add, Search } from '@material-ui/icons';
+import { useHistory } from 'react-router-dom';
 
 import api from '../../../services/api';
 
+import InputText from '../../../components/InputText';
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    chipSuccess: {
+      backgroundColor: theme.palette.success.main,
+      color: '#FFF',
+    },
+    chipDanger: {
+      backgroundColor: theme.palette.error.main,
+      color: '#FFF',
+    },
+  }),
+);
+
 interface User {
   id: number;
-  cpf: string;
   name: string;
   email: string;
-  blocked: boolean;
+  cpf: string;
   enabled: boolean;
-  type: string;
+  blocked: boolean;
 }
 
-const List: React.FC = () => {
+const UserList: React.FC = () => {
+  const classes = useStyles();
+  const history = useHistory();
+
   const [users, setUsers] = useState<User[]>([]);
 
   const [filter, setFilter] = useState('');
   const [page, setPage] = useState(1);
   const [pages, setPages] = useState(0);
+  const [perPage, setPerPage] = useState(10);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     const loadUsers = async (): Promise<void> => {
@@ -43,101 +63,137 @@ const List: React.FC = () => {
         params: {
           filter,
           page,
+          perPage,
         },
       });
 
-      const { data, pages, current } = response.data;
+      const { data, ...rest } = response.data;
 
       setUsers(data);
-      setPages(pages);
-      setPage(current);
+      setPage(rest.page);
+      setPages(rest.pages);
+      setPerPage(rest.perPage);
+      setCount(rest.count);
     };
 
     loadUsers();
-  }, [filter, page]);
+  }, [filter, page, perPage]);
+
+  const handleNavigateToUserCreate = useCallback(() => {
+    history.push('/users/create');
+  }, [history]);
+
+  const handleNavigateToUserShow = useCallback(
+    (user_id: number) => {
+      history.push(`/users/${user_id}`);
+    },
+    [history],
+  );
 
   return (
-    <Box
-      flex={1}
-      marginLeft={8}
-      padding={8}
-      borderRadius={4}
-      backgroundColor="white"
-      shadow="0 0 20px rgba(0, 0, 0, 0.05)"
-    >
-      <Flex alignItems="center" justifyContent="space-between">
+    <Box paddingY={4} paddingX={4}>
+      <Box display="flex" alignItems="center" justifyContent="space-between">
         <Box>
-          <Heading size="lg" fontWeight="medium">
+          <Typography variant="h4" color="textPrimary">
             Usuários
-          </Heading>
-          <Text marginTop={1} color="gray.400">
+          </Typography>
+          <Typography variant="subtitle1" color="textSecondary">
             Listagem completa de usuários
-          </Text>
+          </Typography>
         </Box>
 
-        <Button size="md" leftIcon={<FaPlus size={16} />}>
-          Criar novo
+        <Button
+          variant="outlined"
+          size="large"
+          startIcon={<Add />}
+          color="primary"
+          onClick={handleNavigateToUserCreate}
+        >
+          Adicionar novo
         </Button>
-      </Flex>
+      </Box>
 
-      <Flex marginTop={4}>
+      <Box marginTop={4}>
         <InputText
-          name="nome"
+          size="medium"
+          label="Filtro"
           placeholder="Pesquise por nome ou cpf"
           onChange={(event) => setFilter(event.target.value)}
         />
-      </Flex>
 
-      <Table marginTop={4}>
-        <Thead>
-          <Th>NOME</Th>
-          <Th>CPF</Th>
-          <Th textAlign="center">STATUS</Th>
-          <Th textAlign="center">HABILITADO</Th>
-        </Thead>
-        <Tbody>
-          {users.map((user) => (
-            <Tr key={user.id}>
-              <Td>
-                <Box>
-                  <Text fontWeight="medium" fontSize="sm">
-                    {user.name}
-                  </Text>
-                  <Text color="gray.500" fontSize="small">
-                    {user.email}
-                  </Text>
-                </Box>
-              </Td>
+        <Box marginTop={2}>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Nome</TableCell>
+                  <TableCell>CPF</TableCell>
+                  <TableCell align="center">Bloqueado</TableCell>
+                  <TableCell align="center">Ativo</TableCell>
+                  <TableCell align="center"></TableCell>
+                </TableRow>
+              </TableHead>
 
-              <Td fontSize="sm">019.395.532-61</Td>
-              <Td textAlign="center">
-                {user.blocked ? (
-                  <Tag colorScheme="red">Bloqueado</Tag>
-                ) : (
-                  <Tag colorScheme="green">Ativo</Tag>
-                )}
-              </Td>
-
-              <Td textAlign="center">
-                {user.enabled ? (
-                  <Tag colorScheme="green">Sim</Tag>
-                ) : (
-                  <Tag colorScheme="red">Não</Tag>
-                )}
-              </Td>
-            </Tr>
-          ))}
-        </Tbody>
-      </Table>
-
-      <Paginate
-        pageCount={pages}
-        pageRangeDisplayed={5}
-        marginPagesDisplayed={0}
-        onPageChange={({ selected }) => setPage(selected + 1)}
-      />
+              <TableBody>
+                {users.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <Box>
+                        <Typography variant="subtitle2" color="textPrimary">
+                          {user.name}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          {user.email}
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                    <TableCell>{user.cpf}</TableCell>
+                    <TableCell align="center">
+                      {user.blocked ? (
+                        <Chip label="Sim" className={classes.chipDanger} />
+                      ) : (
+                        <Chip label="Não" className={classes.chipSuccess} />
+                      )}
+                    </TableCell>
+                    <TableCell align="center">
+                      {user.enabled ? (
+                        <Chip label="Sim" className={classes.chipSuccess} />
+                      ) : (
+                        <Chip label="Não" className={classes.chipDanger} />
+                      )}
+                    </TableCell>
+                    <TableCell align="center">
+                      <IconButton
+                        onClick={() => handleNavigateToUserShow(user.id)}
+                      >
+                        <Search color="primary" />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <TablePagination
+              rowsPerPageOptions={[10, 20, 30]}
+              component="div"
+              count={count}
+              rowsPerPage={perPage}
+              page={page - 1}
+              labelDisplayedRows={({ from, to, count }) => (
+                <p>{`${from}-${to} de ${count}`}</p>
+              )}
+              labelRowsPerPage="Linhas por página"
+              onChangePage={(_, page) => setPage(page + 1)}
+              onChangeRowsPerPage={(event) => {
+                setPerPage(Number(event.target.value));
+                setPage(1);
+              }}
+            />
+          </TableContainer>
+        </Box>
+      </Box>
     </Box>
   );
 };
 
-export default List;
+export default UserList;

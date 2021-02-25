@@ -39,6 +39,7 @@ describe('ListUser', () => {
 
     const usersPage = await pageUserService.execute({
       page: 1,
+      perPage: 10,
     });
 
     expect(usersPage.pages).toEqual(1);

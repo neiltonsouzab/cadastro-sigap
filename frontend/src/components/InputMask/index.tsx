@@ -1,54 +1,41 @@
 import React from 'react';
 import {
+  TextField,
+  TextFieldProps,
   FormControl,
-  FormLabel,
-  FormErrorMessage,
-  Input,
-  InputProps,
-  InputGroup,
-  InputLeftElement,
-  Icon as ChakraIcon,
-} from '@chakra-ui/react';
-import ReactInputMask, { Props as ReactInputMaskProps } from 'react-input-mask';
+  FormHelperText,
+} from '@material-ui/core';
+import ReactInputMask from 'react-input-mask';
 
-type InputTextProps = {
-  name: string;
-  mask: string;
-  label?: string;
-  touched?: boolean;
+type InputMaskProps = {
   errors?: string;
-  icon?: React.ElementType;
-} & InputProps &
-  ReactInputMaskProps;
+  touched?: boolean;
+  mask: string;
+} & TextFieldProps;
 
-const InputText: React.FC<InputTextProps> = ({
-  name,
-  label,
-  touched,
+const InputMask: React.FC<InputMaskProps> = ({
   errors,
-  icon: Icon,
+  touched,
+  mask,
   ...rest
 }) => {
   return (
-    <FormControl id={name} isInvalid={touched && !!errors}>
-      {!!label && <FormLabel color="gray.600">{label}</FormLabel>}
-      <InputGroup>
-        {Icon && (
-          <InputLeftElement pointerEvents="none">
-            <ChakraIcon color="gray.300" as={Icon} />
-          </InputLeftElement>
-        )}
-        <Input
-          as={ReactInputMask}
-          size="md"
-          id={name}
-          focusBorderColor="blue.600"
-          {...rest}
-        />
-      </InputGroup>
-      <FormErrorMessage>{errors}</FormErrorMessage>
+    <FormControl variant="outlined" fullWidth error={touched && !!errors}>
+      <TextField
+        fullWidth
+        variant="outlined"
+        error={touched && !!errors}
+        InputProps={{
+          inputComponent: ReactInputMask as any,
+          inputProps: {
+            mask,
+          },
+        }}
+        {...rest}
+      />
+      {touched && errors && <FormHelperText>{errors}</FormHelperText>}
     </FormControl>
   );
 };
 
-export default InputText;
+export default InputMask;

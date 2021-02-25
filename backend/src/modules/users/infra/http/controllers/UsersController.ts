@@ -5,20 +5,23 @@ import { classToClass } from 'class-transformer';
 import CreateUserService from '@modules/users/services/CreateUserService';
 import UpdateUserService from '@modules/users/services/UpdateUserService';
 import PageUserService from '@modules/users/services/PageUserService';
+import ShowUserService from '@modules/users/services/ShowUserService';
 
 interface IndexRequestQuery {
   page?: number;
+  perPage?: number;
   filter?: string;
 }
 
 export default class UsersController {
   public async index(request: Request, response: Response): Promise<Response> {
-    const { page = 1, filter = '' } = request.query as IndexRequestQuery;
+    const { page = 1, perPage = 10, filter = '' } = request.query as IndexRequestQuery;
 
     const pageUserService = container.resolve(PageUserService);
 
     const usersPage = await pageUserService.execute({
       page,
+      perPage,
       filter,
     });
 
@@ -26,6 +29,15 @@ export default class UsersController {
     usersPage.data = data;
 
     return response.json(usersPage);
+  }
+
+  public async show(request: Request, response: Response): Promise<Response> {
+    const { id } = request.params;
+
+    const showUserService = container.resolve(ShowUserService);
+    const user = await showUserService.execute({ id: Number(id) });
+
+    return response.json(classToClass(user));
   }
 
   public async create(request: Request, response: Response): Promise<Response> {

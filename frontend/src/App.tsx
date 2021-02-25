@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { ChakraProvider } from '@chakra-ui/react';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import { ThemeProvider } from '@material-ui/core';
 
 import Routes from './routes';
 import AppProvider from './hooks';
@@ -10,11 +11,12 @@ import theme from './styles/theme';
 const App: React.FC = () => {
   return (
     <Router>
-      <ChakraProvider resetCSS theme={theme}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
         <AppProvider>
           <Routes />
         </AppProvider>
-      </ChakraProvider>
+      </ThemeProvider>
     </Router>
   );
 };

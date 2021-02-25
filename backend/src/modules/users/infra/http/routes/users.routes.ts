@@ -11,16 +11,17 @@ const usersController = new UsersController();
 
 const usersValidation = celebrate({
   [Segments.BODY]: {
-    cpf: Joi.string().required(),
-    name: Joi.string().required(),
-    nickname: Joi.string().required(),
-    email: Joi.string().email().required(),
-    type: Joi.string().required(),
+    cpf: Joi.string().required().messages({"any.required": 'CPF obrigatório.'}),
+    name: Joi.string().required().messages({"any.required": 'Nome obrigatório.'}),
+    nickname: Joi.string().required().messages({"any.required": 'Apelido obrigatório.'}),
+    email: Joi.string().email().required().messages({"any.required": 'Email obrigatório.', 'any.email': 'Email inválido.'}),
+    type: Joi.string().required().messages({"any.required": 'Tipo obrigatório.'}),
     ugs: Joi.array().items(
       Joi.object({
         id: Joi.number().required(),
       }),
-    ),
+    ).min(1).message('Infome ao menos 1 (uma) unidade gestora.'),
+    blocked: Joi.bool(),
   },
 });
 
@@ -30,6 +31,8 @@ usersRoutes.get(
   ensureAuthorized(['ADMINISTRATOR']),
   usersController.index,
 );
+
+usersRoutes.get('/:id', ensureAuthenticated, ensureAuthorized(['ADMINISTRATOR']), usersController.show);
 
 usersRoutes.post(
   '/',

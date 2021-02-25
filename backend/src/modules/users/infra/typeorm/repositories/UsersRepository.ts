@@ -15,11 +15,9 @@ class UsersRepository implements IUsersRepository {
 
   public async find({
     page,
+    perPage,
     filter,
   }: IPaginator): Promise<IPage<User>> {
-    const perPage = 10;
-    const current = Number(page);
-
     const skip = page * perPage - perPage;
     const take = perPage;
 
@@ -32,7 +30,8 @@ class UsersRepository implements IUsersRepository {
       ])
     }
 
-    const pages = Math.ceil((await query.getCount()) / perPage);
+    const count = await query.getCount();
+    const pages = Math.ceil(count / perPage);
 
     query.take(take);
     query.skip(skip);
@@ -40,14 +39,18 @@ class UsersRepository implements IUsersRepository {
     const data = await query.getMany();
 
     return {
-      current,
+      page: Number(page),
       pages,
+      perPage: Number(perPage),
+      count,
       data,
     };
   }
 
   public async findById(id: number): Promise<User | undefined> {
-    const user = await this.ormRepository.findOne(id);
+    const user = await this.ormRepository.findOne(id, {
+      relations: ['ugs']
+    });
 
     return user;
   }

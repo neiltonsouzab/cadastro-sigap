@@ -1,14 +1,21 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Divider,
+  Grid,
+  Typography,
+} from '@material-ui/core';
 import { useFormik } from 'formik';
-import { Button, Flex, Heading, Link, VStack } from '@chakra-ui/react';
-import { FaUserAlt, FaLock } from 'react-icons/fa';
 import * as Yup from 'yup';
 
-import { useAuth } from '../../hooks/auth';
-
-import InputText from '../../components/InputText';
 import InputMask from '../../components/InputMask';
+import InputText from '../../components/InputText';
+
+import { useAuth } from '../../hooks/auth';
+import { useToast } from '../../hooks/toast';
 
 const validationSchema = Yup.object({
   cpf: Yup.string().required('CPF obrigatório.'),
@@ -18,93 +25,104 @@ const validationSchema = Yup.object({
 const SignIn: React.FC = () => {
   const history = useHistory();
   const { signIn } = useAuth();
+  const { addToast } = useToast();
 
   const formik = useFormik({
+    validationSchema,
     initialValues: {
       cpf: '',
       password: '',
     },
-    validationSchema,
     onSubmit: async (data) => {
-      await signIn({
-        cpf: data.cpf,
-        password: data.password,
-      });
+      try {
+        await signIn({
+          cpf: data.cpf,
+          password: data.password,
+        });
 
-      history.push('/users');
+        history.push('/users');
+      } catch {
+        addToast({
+          title: 'Algo de errado aconteceu',
+          description:
+            'Ocorreu um erro ao realizar login. Cheque suas credenciais',
+          type: 'error',
+        });
+      }
     },
   });
 
   return (
-    <Flex
-      as="form"
-      w="100%"
-      bg="white"
-      flexDir="column"
+    <Box
+      component="div"
+      flex={1}
       maxWidth={400}
-      padding={8}
-      borderRadius={4}
-      shadow="0 0 20px rgba(0, 0, 0, 0.05)"
-      onSubmit={(event) => {
-        event.preventDefault();
-        formik.handleSubmit();
-      }}
+      paddingY={4}
+      paddingX={4}
+      boxShadow="0 0 20px rgb(0 0 0 / 5%)"
+      bgcolor="#FFF"
     >
-      <Heading size="md" color="blue.700">
-        Fazer login
-      </Heading>
+      <Typography variant="h6" color="textPrimary">
+        Login
+      </Typography>
+      <Typography variant="body2" color="textSecondary">
+        Faça login para acessar o sistema
+      </Typography>
 
-      <VStack spacing={4} marginTop={8}>
-        <InputMask
-          mask="999.999.999-99"
-          id="cpf"
-          name="cpf"
-          placeholder="CPF"
-          icon={FaUserAlt}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.cpf}
-          touched={formik.touched.cpf}
-          errors={formik.errors.cpf}
-        />
-        <InputText
-          id="password"
-          name="password"
-          type="password"
-          placeholder="Senha"
-          icon={FaLock}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          value={formik.values.password}
-          touched={formik.touched.password}
-          errors={formik.errors.password}
-        />
-      </VStack>
+      <Box marginY={2}>
+        <Divider />
+      </Box>
 
-      <Button
-        size="lg"
-        fontSize="md"
-        color="white"
-        marginTop={4}
-        colorScheme="blue"
-        type="submit"
-        isLoading={formik.isSubmitting}
+      <Box
+        component="form"
+        marginTop={2}
+        onSubmit={(event) => {
+          event.preventDefault();
+          formik.handleSubmit();
+        }}
       >
-        ENTRAR
-      </Button>
+        <Grid container spacing={2} direction="column">
+          <Grid item>
+            <InputMask
+              label="CPF"
+              name="cpf"
+              required
+              mask="999.999.999-99"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              touched={formik.touched.cpf}
+              errors={formik.errors.cpf}
+            />
+          </Grid>
 
-      <Link
-        href="/forgot-password"
-        alignSelf="center"
-        mt={4}
-        fontSize="sm"
-        color="blue.500"
-        _hover={{ color: 'blue.700' }}
-        _active={{ color: 'blue.800' }}
-      >
-        Esqueceu sua senha?
-      </Link>
-    </Flex>
+          <Grid item>
+            <InputText
+              label="Senha"
+              name="password"
+              required
+              type="password"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              touched={formik.touched.password}
+              errors={formik.errors.password}
+            />
+          </Grid>
+
+          <Grid item>
+            <Button
+              type="submit"
+              size="large"
+              variant="contained"
+              color="primary"
+              fullWidth
+              disabled={formik.isSubmitting}
+            >
+              {formik.isSubmitting ? <CircularProgress size={24} /> : 'ENTRAR'}
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
+    </Box>
   );
 };
 

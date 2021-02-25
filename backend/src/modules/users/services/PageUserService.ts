@@ -6,6 +6,7 @@ import IUsersRepository from '../repositories/IUsersRepository';
 
 interface IRequest {
   page: number;
+  perPage: number;
   filter?: string;
 }
 
@@ -16,9 +17,10 @@ class PageUserService {
     private usersRepository: IUsersRepository,
   ) {}
 
-  public async execute({ page, filter }: IRequest): Promise<IPage<User>> {
+  public async execute({ page, perPage, filter }: IRequest): Promise<IPage<User>> {
     const usersPage = await this.usersRepository.find({
       page,
+      perPage,
       filter,
     });
 

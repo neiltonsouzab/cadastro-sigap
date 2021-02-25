@@ -5,7 +5,7 @@ import { createContext, useCallback, useState } from 'react';
 import api from '../services/api';
 
 export interface Ug {
-  id: string;
+  id: number;
   code: string;
   name: string;
   short_name: string;

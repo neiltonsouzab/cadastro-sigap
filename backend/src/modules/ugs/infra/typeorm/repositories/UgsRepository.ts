@@ -12,7 +12,11 @@ class UgsRepository implements IUgsRepository {
   }
 
   public async findAll(): Promise<Ug[]> {
-    const ugs = await this.ormRepository.find();
+    const ugs = await this.ormRepository.find({
+      order: {
+        code: 'ASC'
+      },
+    });
 
     return ugs;
   }
