@@ -1,5 +1,7 @@
 import ICreateUgRegistrationDTO from '@modules/ugs/dtos/ICreateUgRegistrationDTO';
 import UgRegistration from '@modules/ugs/infra/typeorm/entities/UgRegistration';
+import IPage from '@shared/models/IPage';
+import IPaginator from '@shared/models/IPaginator';
 import IUgsRegistrationsRepository from '../IUgsRegistrationsRepository';
 
 class FakeUgsRegistrationsRepository implements IUgsRegistrationsRepository {
@@ -26,12 +28,30 @@ class FakeUgsRegistrationsRepository implements IUgsRegistrationsRepository {
     return ugRegistration;
   }
 
-  public async findByUg(ug_id: number): Promise<UgRegistration[]> {
-    const ugRegistration = this.ugsRegistrations.filter(
-      findUgRegistration => findUgRegistration.ug_id === ug_id,
-    );
+  public async findByUgs({ page, perPage, filter }: IPaginator<number[]>): Promise<IPage<UgRegistration>> {
+    const skip = page * perPage - perPage;
+    const take = perPage;
 
-    return ugRegistration;
+    let data = this.ugsRegistrations;
+
+    if (filter) {
+      data = this.ugsRegistrations.filter(
+        findUgRegistration => filter.includes(findUgRegistration.id),
+      );
+    }
+
+    const count = data.length;
+    const pages= Math.ceil(count / perPage);
+
+    data = data.slice(skip, take);
+
+    return {
+      page,
+      pages,
+      perPage,
+      count,
+      data,
+    };
   }
 
   public async create({

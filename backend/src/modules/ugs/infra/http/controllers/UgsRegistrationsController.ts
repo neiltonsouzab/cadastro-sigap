@@ -2,18 +2,35 @@ import { Request, Response } from 'express';
 import { container } from 'tsyringe';
 
 import CreateUgRegistrationService from '@modules/ugs/services/CreateUgRegistrationService';
-import ListUgRegistrationService from '@modules/ugs/services/ListUgRegistrationService';
+import PageUgRegistrationService from '@modules/ugs/services/PageUgRegistrationService';
+import { type } from 'os';
+
+
+interface IndexQueryParams {
+  page?: number;
+  perPage?: number;
+  filter?: number[];
+}
 
 export default class UgsRegistrationsController {
   public async index(request: Request, response: Response): Promise<Response> {
-    const { ug_id } = request.query;
+    const { page = 1, perPage = 10, filter  } = request.query as IndexQueryParams;
 
-    const listUgRegistrationService = container.resolve(
-      ListUgRegistrationService,
+    const pageUgRegistrationService = container.resolve(
+      PageUgRegistrationService,
     );
 
-    const ugsRegistrations = await listUgRegistrationService.execute({
-      ug_id: Number(ug_id),
+    let ugsIdsFilter = filter || request.user.ugs.map(ug => ug.id);
+    
+    if (typeof(filter) === 'string') {
+      ugsIdsFilter = [filter];
+    }
+
+    
+    const ugsRegistrations = await pageUgRegistrationService.execute({
+      page,
+      perPage,
+      filter: ugsIdsFilter.map(Number),
       user: request.user,
     });
 

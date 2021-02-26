@@ -11,9 +11,7 @@ class FakeUsersRepository implements IUsersRepository {
     page,
     perPage,
     filter,
-  }: IPaginator): Promise<IPage<User>> {
-    const current = page;
-
+  }: IPaginator<string>): Promise<IPage<User>> {
     const skip = page * perPage - perPage;
     const take = perPage;
 

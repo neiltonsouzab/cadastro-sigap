@@ -1,8 +1,10 @@
-import { getRepository, Repository } from 'typeorm';
+import { getRepository, Repository, In } from 'typeorm';
 
 import IUgsRegistrationsRepository from '@modules/ugs/repositories/IUgsRegistrationsRepository';
 import ICreateUgRegistrationDTO from '@modules/ugs/dtos/ICreateUgRegistrationDTO';
 import UgRegistration from '../entities/UgRegistration';
+import IPaginator from '@shared/models/IPaginator';
+import IPage from '@shared/models/IPage';
 
 class UgsRegistrationsRepository implements IUgsRegistrationsRepository {
   private ormRepository: Repository<UgRegistration>;
@@ -31,14 +33,33 @@ class UgsRegistrationsRepository implements IUgsRegistrationsRepository {
     return ugRegistration;
   }
 
-  public async findByUg(ug_id: number): Promise<UgRegistration[]> {
-    const ugsRegistrations = await this.ormRepository.find({
-      where: {
-        ug_id,
-      },
-    });
+  public async findByUgs({ page, perPage, filter }: IPaginator<number[]>): Promise<IPage<UgRegistration>> {
+    const skip = page * perPage - perPage;
+    const take = perPage;
 
-    return ugsRegistrations;
+    const query = this.ormRepository.createQueryBuilder();
+
+    if (filter) {
+      query.where({
+        ug_id: In(filter),
+      });
+    };
+
+    const count = await query.getCount();
+    const pages = Math.ceil(count / perPage);
+
+    const data = await query.getMany();
+
+    query.take(take);
+    query.skip(skip);
+
+    return {
+      page: Number(page),
+      pages,
+      perPage: Number(perPage),
+      count,
+      data,
+    };;
   }
 
   public async create({

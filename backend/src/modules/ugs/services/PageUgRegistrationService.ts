@@ -4,30 +4,39 @@ import User from '@modules/users/infra/typeorm/entities/User';
 import AppError from '@shared/errors/AppError';
 import UgRegistration from '../infra/typeorm/entities/UgRegistration';
 import IUgsRegistrationsRepository from '../repositories/IUgsRegistrationsRepository';
+import IPage from '@shared/models/IPage';
 
 interface IRequest {
-  ug_id: number;
+  page: number;
+  perPage: number;
+  filter: number[];
   user: User;
 }
 
 @injectable()
-class ListUgRegistrationService {
+class PageUgRegistrationService {
   constructor(
     @inject('UgsRegistrationsRepository')
     private ugsRegistrationsService: IUgsRegistrationsRepository,
   ) {}
 
-  public async execute({ ug_id, user }: IRequest): Promise<UgRegistration[]> {
-    const userAuthorizedUg = user.ugs.find(ug => ug.id === ug_id);
+  public async execute({ page, perPage, filter, user }: IRequest): Promise<IPage<UgRegistration>> {
+    console.log(filter);
 
+    const userAuthorizedUg = user.ugs.find(ug => filter.includes(ug.id));
+    
     if (!userAuthorizedUg) {
       throw new AppError('Usuário sem autorização para esta UG.');
     }
 
-    const ugsRegistrations = await this.ugsRegistrationsService.findByUg(ug_id);
+    const ugsRegistrationsPage = await this.ugsRegistrationsService.findByUgs({
+      page: 1,
+      perPage: 10,
+      filter,
+    });
 
-    return ugsRegistrations;
+    return ugsRegistrationsPage;
   }
 }
 
-export default ListUgRegistrationService;
+export default PageUgRegistrationService;

@@ -17,7 +17,7 @@ class UsersRepository implements IUsersRepository {
     page,
     perPage,
     filter,
-  }: IPaginator): Promise<IPage<User>> {
+  }: IPaginator<string>): Promise<IPage<User>> {
     const skip = page * perPage - perPage;
     const take = perPage;
 

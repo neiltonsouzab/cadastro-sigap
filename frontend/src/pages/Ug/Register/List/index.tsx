@@ -30,6 +30,23 @@ import { useHistory } from 'react-router-dom';
 import api from '../../../../services/api';
 import { useAuth } from '../../../../hooks/auth';
 
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    chipDefault: {
+      backgroundColor: theme.palette.primary.main,
+      color: '#FFF',
+    },
+    chipSuccess: {
+      backgroundColor: theme.palette.success.main,
+      color: '#FFF',
+    },
+    chipDanger: {
+      backgroundColor: theme.palette.error.main,
+      color: '#FFF',
+    },
+  }),
+);
+
 interface Ug {
   id: number;
   code: string;
@@ -38,6 +55,8 @@ interface Ug {
 }
 
 const UserList: React.FC = () => {
+  const classes = useStyles();
+
   const history = useHistory();
   const { user } = useAuth();
 
@@ -126,6 +145,48 @@ const UserList: React.FC = () => {
             ))}
           </Select>
         </FormControl>
+
+        <Box>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>UG</TableCell>
+                  <TableCell align="center">Data registro</TableCell>
+                  <TableCell align="center">Data análise</TableCell>
+                  <TableCell align="center">STATUS</TableCell>
+                  <TableCell />
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                <TableRow>
+                  <TableCell>
+                    <Box>
+                      <Box>
+                        <Typography variant="subtitle2" color="textPrimary">
+                          14001 - SEFIN
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          SECRETARIA DE ESTADO DE FINANCAS
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </TableCell>
+                  <TableCell align="center">21/02/2021 17:00</TableCell>
+                  <TableCell align="center">25/02/2021 09:30</TableCell>
+                  <TableCell align="center">
+                    <Chip className={classes.chipDanger} label="REJEITADO" />
+                  </TableCell>
+                  <TableCell align="center">
+                    <IconButton>
+                      <Search color="primary" />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
       </Box>
     </Box>
   );

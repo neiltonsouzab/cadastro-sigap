@@ -1,3 +1,5 @@
+import IPage from '@shared/models/IPage';
+import IPaginator from '@shared/models/IPaginator';
 import ICreateUgRegistrationDTO from '../dtos/ICreateUgRegistrationDTO';
 import UgRegistration from '../infra/typeorm/entities/UgRegistration';
 
@@ -9,5 +11,5 @@ export default interface IUgsRegistrationsRepository {
     ug_id: number,
     status: string,
   ): Promise<UgRegistration | undefined>;
-  findByUg(ug_id: number): Promise<UgRegistration[]>;
+  findByUgs(paginator: IPaginator<number[]>): Promise<IPage<UgRegistration>>;
 }

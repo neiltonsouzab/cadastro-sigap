@@ -1,17 +1,17 @@
 import FakeUsersRepository from '@modules/users/repositories/fakes/FakeUsersRepository';
 import AppError from '@shared/errors/AppError';
 import FakeUgsRegistrationsRepository from '../repositories/fakes/FakeUgsRegistrationsRepository';
-import ListUgRegistrationService from './ListUgRegistrationService';
+import PageUgRegistrationService from './PageUgRegistrationService';
 
 let fakeUgsRegistrationsRepository: FakeUgsRegistrationsRepository;
 let fakeUsersRepository: FakeUsersRepository;
-let listUgRegistrationService: ListUgRegistrationService;
+let pageUgRegistrationService: PageUgRegistrationService;
 
 describe('ListUgRegistration', () => {
   beforeEach(() => {
     fakeUgsRegistrationsRepository = new FakeUgsRegistrationsRepository();
     fakeUsersRepository = new FakeUsersRepository();
-    listUgRegistrationService = new ListUgRegistrationService(
+    pageUgRegistrationService = new PageUgRegistrationService(
       fakeUgsRegistrationsRepository,
     );
   });
@@ -30,7 +30,7 @@ describe('ListUgRegistration', () => {
       ],
     });
 
-    const ugRegistration = await fakeUgsRegistrationsRepository.create({
+     await fakeUgsRegistrationsRepository.create({
       cnpj: '11.111.111/1111-11',
       name: 'Name',
       fantasy_name: 'FantasyName',
@@ -63,13 +63,15 @@ describe('ListUgRegistration', () => {
       ],
     });
 
-    const ugsRegistrations = await listUgRegistrationService.execute({
-      ug_id: 1,
+    const ugsRegistrationsPage = await pageUgRegistrationService.execute({
+      page: 1,
+      perPage: 10,
+      filter: [1],
       user,
     });
 
-    expect(ugsRegistrations).toHaveLength(1);
-    expect(ugsRegistrations).toEqual([ugRegistration]);
+    expect(ugsRegistrationsPage.pages).toEqual(1);
+    expect(ugsRegistrationsPage.data).toHaveLength(2);
   });
 
   it('should not be able list ug registration in ug not authorized for user', async () => {
@@ -87,8 +89,10 @@ describe('ListUgRegistration', () => {
     });
 
     await expect(
-      listUgRegistrationService.execute({
-        ug_id: 2,
+      pageUgRegistrationService.execute({
+        page: 1,
+        perPage: 10,
+        filter: [2],
         user,
       }),
     ).rejects.toBeInstanceOf(AppError);

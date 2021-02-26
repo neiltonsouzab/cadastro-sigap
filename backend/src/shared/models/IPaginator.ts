@@ -1,5 +1,5 @@
-export default interface IPaginator {
+export default interface IPaginator<T> {
   page: number;
   perPage: number;
-  filter?: string;
+  filter?: T;
 }
