@@ -9,23 +9,23 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  TablePagination,
   Chip,
   makeStyles,
   createStyles,
   Theme,
   IconButton,
   InputLabel,
-  Input,
   Checkbox,
   ListItemText,
   FormControl,
   Select,
   MenuItem,
-  Grid,
+  TablePagination,
 } from '@material-ui/core';
 import { Add, Search } from '@material-ui/icons';
 import { useHistory } from 'react-router-dom';
+import { format, parseISO } from 'date-fns';
+import qs from 'qs';
 
 import api from '../../../../services/api';
 import { useAuth } from '../../../../hooks/auth';
@@ -54,13 +54,66 @@ interface Ug {
   short_name: string;
 }
 
+interface UgRegistration {
+  id: number;
+  ug: Ug;
+  status: 'ANALISE' | 'REJEITADO' | 'APROVADO';
+  created_at: string;
+  updated_at: string;
+}
+
 const UserList: React.FC = () => {
   const classes = useStyles();
+
+  const status = {
+    ANALISE: classes.chipDefault,
+    REJEITADO: classes.chipDanger,
+    APROVADO: classes.chipSuccess,
+  };
 
   const history = useHistory();
   const { user } = useAuth();
 
   const [selectedsUgs, setSelectedsUgs] = useState<number[]>([]);
+
+  const [ugsRegistrations, setUgsRegistrations] = useState<UgRegistration[]>(
+    [],
+  );
+
+  const [page, setPage] = useState(1);
+  const [pages, setPages] = useState(0);
+  const [perPage, setPerPage] = useState(10);
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const loadUgsRegistrations = async (): Promise<void> => {
+      const response = await api.get('/ugs-registrations', {
+        params: {
+          filter: selectedsUgs,
+        },
+        paramsSerializer: (params) => {
+          return qs.stringify(params);
+        },
+      });
+
+      const { data, ...rest } = response.data;
+
+      setUgsRegistrations(
+        (data as UgRegistration[]).map((item) => ({
+          ...item,
+          created_at: format(parseISO(item.created_at), 'dd/MM/yyyy HH:mm:ss'),
+          updated_at: format(parseISO(item.updated_at), 'dd/MM/yyyy HH:mm:ss'),
+        })),
+      );
+
+      setPage(rest.page);
+      setPages(rest.pages);
+      setPerPage(rest.perPage);
+      setCount(rest.count);
+    };
+
+    loadUgsRegistrations();
+  }, [selectedsUgs]);
 
   const isAllSelected = useMemo(() => {
     return user.ugs.length === selectedsUgs.length;
@@ -159,32 +212,59 @@ const UserList: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow>
-                  <TableCell>
-                    <Box>
+                {ugsRegistrations.map((ugRegistration) => (
+                  <TableRow key={ugRegistration.id}>
+                    <TableCell>
                       <Box>
-                        <Typography variant="subtitle2" color="textPrimary">
-                          14001 - SEFIN
-                        </Typography>
-                        <Typography variant="body2" color="textSecondary">
-                          SECRETARIA DE ESTADO DE FINANCAS
-                        </Typography>
+                        <Box>
+                          <Typography variant="subtitle2" color="textPrimary">
+                            {ugRegistration.ug.code} -{' '}
+                            {ugRegistration.ug.short_name}
+                          </Typography>
+                          <Typography variant="body2" color="textSecondary">
+                            {ugRegistration.ug.name}
+                          </Typography>
+                        </Box>
                       </Box>
-                    </Box>
-                  </TableCell>
-                  <TableCell align="center">21/02/2021 17:00</TableCell>
-                  <TableCell align="center">25/02/2021 09:30</TableCell>
-                  <TableCell align="center">
-                    <Chip className={classes.chipDanger} label="REJEITADO" />
-                  </TableCell>
-                  <TableCell align="center">
-                    <IconButton>
-                      <Search color="primary" />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
+                    </TableCell>
+                    <TableCell align="center">
+                      {ugRegistration.created_at}
+                    </TableCell>
+                    <TableCell align="center">
+                      {ugRegistration.updated_at}
+                    </TableCell>
+                    <TableCell align="center">
+                      <Chip
+                        className={status[ugRegistration.status]}
+                        label={ugRegistration.status}
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <IconButton>
+                        <Search color="primary" />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
+
+            <TablePagination
+              rowsPerPageOptions={[10, 20, 30]}
+              component="div"
+              count={count}
+              rowsPerPage={perPage}
+              page={page - 1}
+              labelDisplayedRows={({ from, to, count }) => (
+                <p>{`${from}-${to} de ${count}`}</p>
+              )}
+              labelRowsPerPage="Linhas por página"
+              onChangePage={(_, page) => setPage(page + 1)}
+              onChangeRowsPerPage={(event) => {
+                setPerPage(Number(event.target.value));
+                setPage(1);
+              }}
+            />
           </TableContainer>
         </Box>
       </Box>

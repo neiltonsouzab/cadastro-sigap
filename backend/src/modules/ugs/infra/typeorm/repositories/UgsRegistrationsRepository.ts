@@ -5,6 +5,7 @@ import ICreateUgRegistrationDTO from '@modules/ugs/dtos/ICreateUgRegistrationDTO
 import UgRegistration from '../entities/UgRegistration';
 import IPaginator from '@shared/models/IPaginator';
 import IPage from '@shared/models/IPage';
+import Ug from '../entities/Ug';
 
 class UgsRegistrationsRepository implements IUgsRegistrationsRepository {
   private ormRepository: Repository<UgRegistration>;
@@ -37,7 +38,7 @@ class UgsRegistrationsRepository implements IUgsRegistrationsRepository {
     const skip = page * perPage - perPage;
     const take = perPage;
 
-    const query = this.ormRepository.createQueryBuilder();
+    const query = this.ormRepository.createQueryBuilder('UgRegistration');
 
     if (filter) {
       query.where({
@@ -45,11 +46,13 @@ class UgsRegistrationsRepository implements IUgsRegistrationsRepository {
       });
     };
 
+    
     const count = await query.getCount();
     const pages = Math.ceil(count / perPage);
 
+    query.innerJoinAndSelect('UgRegistration.ug', 'ug');
     const data = await query.getMany();
-
+    
     query.take(take);
     query.skip(skip);
 
