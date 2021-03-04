@@ -139,7 +139,7 @@ const UserList: React.FC = () => {
             Registros de UG
           </Typography>
           <Typography variant="subtitle1" color="textSecondary">
-            Listagem completa de registros submetidos pelas unidades gestoras.
+            Listagem completa de registros enviados pelas unidades gestoras.
           </Typography>
         </Box>
 

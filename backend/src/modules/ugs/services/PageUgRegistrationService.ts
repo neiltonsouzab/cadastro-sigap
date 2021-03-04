@@ -21,8 +21,6 @@ class PageUgRegistrationService {
   ) {}
 
   public async execute({ page, perPage, filter, user }: IRequest): Promise<IPage<UgRegistration>> {
-    console.log(filter);
-
     const userAuthorizedUg = user.ugs.find(ug => filter.includes(ug.id));
     
     if (!userAuthorizedUg) {
