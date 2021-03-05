@@ -19,6 +19,9 @@ class UgRegistration {
   id: number;
 
   @Column()
+  code: string;
+
+  @Column()
   cnpj: string;
 
   @Column()

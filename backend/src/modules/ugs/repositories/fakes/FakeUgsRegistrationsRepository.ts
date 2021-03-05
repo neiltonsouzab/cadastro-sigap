@@ -55,6 +55,7 @@ class FakeUgsRegistrationsRepository implements IUgsRegistrationsRepository {
   }
 
   public async create({
+    code,
     cnpj,
     name,
     fantasy_name,
@@ -81,6 +82,7 @@ class FakeUgsRegistrationsRepository implements IUgsRegistrationsRepository {
 
     Object.assign(ugRegistration, {
       id: this.ugsRegistrations.length + 1,
+      code,
       cnpj,
       name,
       fantasy_name,

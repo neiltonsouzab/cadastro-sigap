@@ -6,6 +6,7 @@ import UgRegistration from '../infra/typeorm/entities/UgRegistration';
 import IUgsRegistrationsRepository from '../repositories/IUgsRegistrationsRepository';
 
 interface IRequest {
+  code: string;
   cnpj: string;
   name: string;
   fantasy_name: string;
@@ -32,7 +33,7 @@ interface IRequest {
     original_name: string;
     content_type: string;
     size: number;
-    type: string;
+    from: string;
   }>;
 }
 
@@ -44,6 +45,7 @@ class CreateUgRegistrationService {
   ) {}
 
   public async execute({
+    code,
     cnpj,
     name,
     fantasy_name,
@@ -92,6 +94,7 @@ class CreateUgRegistrationService {
     }
 
     const ugRegistration = await this.ugsRegistrationsRepository.create({
+      code,
       cnpj,
       name,
       fantasy_name,

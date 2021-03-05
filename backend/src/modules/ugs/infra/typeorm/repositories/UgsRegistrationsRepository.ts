@@ -66,6 +66,7 @@ class UgsRegistrationsRepository implements IUgsRegistrationsRepository {
   }
 
   public async create({
+    code,
     cnpj,
     name,
     fantasy_name,
@@ -90,6 +91,7 @@ class UgsRegistrationsRepository implements IUgsRegistrationsRepository {
     files,
   }: ICreateUgRegistrationDTO): Promise<UgRegistration> {
     const ugRegistration = this.ormRepository.create({
+      code,
       cnpj,
       name,
       fantasy_name,

@@ -33,7 +33,7 @@ export default class CreateFiles1610464510936 implements MigrationInterface {
             scale: 2,
           },
           {
-            name: 'type',
+            name: 'from',
             type: 'varchar',
           },
           {

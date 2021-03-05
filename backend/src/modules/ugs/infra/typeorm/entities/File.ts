@@ -25,7 +25,7 @@ class File {
   size: number;
 
   @Column()
-  type: string;
+  from: string;
 
   @ManyToOne(() => UgRegistration, ug_registration => ug_registration.files)
   @JoinColumn({ name: 'ug_registration_id' })

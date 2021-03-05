@@ -1,4 +1,5 @@
 export default interface ICreateUgRegistrationDTO {
+  code: string;
   cnpj: string;
   name: string;
   fantasy_name: string;
@@ -25,6 +26,6 @@ export default interface ICreateUgRegistrationDTO {
     original_name: string;
     content_type: string;
     size: number;
-    type: string;
+    from: string;
   }>;
 }

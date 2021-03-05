@@ -8,7 +8,7 @@ declare global {
 
     namespace Multer {
       export interface File { // eslint-disable-line
-        type: string;
+        from: string;
       }
     }
   }

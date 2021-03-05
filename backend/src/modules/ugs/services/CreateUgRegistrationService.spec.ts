@@ -31,6 +31,7 @@ describe('CreateUgRegistration', () => {
     });
 
     const ugRegistration = await createUgRegistrationService.execute({
+      code: '1111',
       cnpj: '11.111.111/1111-11',
       name: 'Name',
       fantasy_name: 'FantasyName',
@@ -58,7 +59,7 @@ describe('CreateUgRegistration', () => {
           original_name: 'original-name',
           content_type: 'content-type',
           size: 10,
-          type: 'type',
+          from: 'type',
         },
       ],
     });
@@ -85,6 +86,7 @@ describe('CreateUgRegistration', () => {
 
     await expect(
       createUgRegistrationService.execute({
+        code: '1111',
         cnpj: '11.111.111/1111-11',
         name: 'Name',
         fantasy_name: 'FantasyName',
@@ -112,7 +114,7 @@ describe('CreateUgRegistration', () => {
             original_name: 'original-name',
             content_type: 'content-type',
             size: 10,
-            type: 'type',
+            from: 'type',
           },
         ],
       }),
@@ -134,6 +136,7 @@ describe('CreateUgRegistration', () => {
     });
 
     const ugRegistration = await fakeUgsRegistrationsRepository.create({
+      code: '1111',
       cnpj: '11.111.111/1111-11',
       name: 'Name',
       fantasy_name: 'FantasyName',
@@ -161,7 +164,7 @@ describe('CreateUgRegistration', () => {
           original_name: 'original-name',
           content_type: 'content-type',
           size: 10,
-          type: 'type',
+          from: 'type',
         },
       ],
     });
@@ -172,6 +175,7 @@ describe('CreateUgRegistration', () => {
 
     await expect(
       createUgRegistrationService.execute({
+        code: '1111',
         cnpj: '11.111.111/1111-11',
         name: 'Name',
         fantasy_name: 'FantasyName',
@@ -199,7 +203,7 @@ describe('CreateUgRegistration', () => {
             original_name: 'original-name',
             content_type: 'content-type',
             size: 10,
-            type: 'type',
+            from: 'type',
           },
         ],
       }),
@@ -221,6 +225,7 @@ describe('CreateUgRegistration', () => {
     });
 
     await fakeUgsRegistrationsRepository.create({
+      code: '1111',
       cnpj: '11.111.111/1111-11',
       name: 'Name',
       fantasy_name: 'FantasyName',
@@ -248,13 +253,14 @@ describe('CreateUgRegistration', () => {
           original_name: 'original-name',
           content_type: 'content-type',
           size: 10,
-          type: 'type',
+          from: 'type',
         },
       ],
     });
 
     await expect(
       createUgRegistrationService.execute({
+        code: '1111',
         cnpj: '11.111.111/1111-11',
         name: 'Name',
         fantasy_name: 'FantasyName',
@@ -282,7 +288,7 @@ describe('CreateUgRegistration', () => {
             original_name: 'original-name',
             content_type: 'content-type',
             size: 10,
-            type: 'type',
+            from: 'type',
           },
         ],
       }),

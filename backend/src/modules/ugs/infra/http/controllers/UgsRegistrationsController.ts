@@ -3,7 +3,6 @@ import { container } from 'tsyringe';
 
 import CreateUgRegistrationService from '@modules/ugs/services/CreateUgRegistrationService';
 import PageUgRegistrationService from '@modules/ugs/services/PageUgRegistrationService';
-import { type } from 'os';
 
 
 interface IndexQueryParams {
@@ -39,6 +38,7 @@ export default class UgsRegistrationsController {
 
   public async create(request: Request, response: Response): Promise<Response> {
     const {
+      code,
       cnpj,
       name,
       fantasy_name,
@@ -68,7 +68,7 @@ export default class UgsRegistrationsController {
       original_name: file.originalname,
       content_type: file.mimetype,
       size: file.size,
-      type: file.type || 'ordinator',
+      from: file.from,
     }));
 
     const createUgRegistrationService = container.resolve(
@@ -76,6 +76,7 @@ export default class UgsRegistrationsController {
     );
 
     const ugRegistration = await createUgRegistrationService.execute({
+      code,
       cnpj,
       name,
       fantasy_name,

@@ -16,6 +16,10 @@ export default class CreateUgsRegistrations1610462890755
             generationStrategy: 'increment',
           },
           {
+            name: 'code',
+            type: 'varchar',
+          },
+          {
             name: 'cnpj',
             type: 'varchar',
           },
@@ -59,6 +63,7 @@ export default class CreateUgsRegistrations1610462890755
           {
             name: 'site',
             type: 'varchar',
+            isNullable: true,
           },
           {
             name: 'short_name',
