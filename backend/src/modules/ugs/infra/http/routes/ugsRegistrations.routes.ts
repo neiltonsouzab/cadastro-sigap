@@ -21,7 +21,7 @@ ugsRegistrationsRoutes.post(
   '/',
   ensureAuthenticated,
   ensureAuthorized(['ADMINISTRATOR', 'CONTADOR']),
-  upload.array('files'),
+  upload.fields([{ name: 'file1', maxCount: 2 }, { name: 'file2', maxCount: 2 }]),
   ugsRegistrationsController.create,
 );
 

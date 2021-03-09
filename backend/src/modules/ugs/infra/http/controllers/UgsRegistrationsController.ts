@@ -61,15 +61,23 @@ export default class UgsRegistrationsController {
       ug_id,
     } = request.body;
 
-    const requestFiles = request.files as Express.Multer.File[];
-
-    const files = requestFiles.map(file => ({
+    const files1 = request.files.file1.map(file => ({
       name: file.filename,
       original_name: file.originalname,
       content_type: file.mimetype,
       size: file.size,
-      from: file.from,
+      from: 'ug',
     }));
+
+    const files2 = request.files.file2.map(file => ({
+      name: file.filename,
+      original_name: file.originalname,
+      content_type: file.mimetype,
+      size: file.size,
+      from: 'ordinator',
+    }));
+
+    const files = [...files1, ...files2];
 
     const createUgRegistrationService = container.resolve(
       CreateUgRegistrationService,

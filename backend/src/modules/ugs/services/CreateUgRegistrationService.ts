@@ -69,7 +69,7 @@ class CreateUgRegistrationService {
     ug_id,
     files,
   }: IRequest): Promise<UgRegistration> {
-    const userAuthorizedUg = user.ugs.find(ug => ug.id === ug_id);
+    const userAuthorizedUg = user.ugs.find(ug => ug.id == ug_id);
 
     if (!userAuthorizedUg) {
       throw new AppError('Usuário não tem autorização para esta UG.');
