@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
+import { classToClass } from 'class-transformer';
 
 import CreateUgRegistrationService from '@modules/ugs/services/CreateUgRegistrationService';
 import PageUgRegistrationService from '@modules/ugs/services/PageUgRegistrationService';
+import ShowUgRegistrationService from '@modules/ugs/services/ShowUgRegistrationService';
+import UpdateUgRegistrationService from '@modules/ugs/services/UpdateUgRegistrationService';
 
 
 interface IndexQueryParams {
@@ -110,5 +113,34 @@ export default class UgsRegistrationsController {
     });
 
     return response.status(201).json(ugRegistration);
+  }
+
+  public async update(request: Request, response: Response): Promise<Response> {
+    const { id } = request.params;
+    const { status, status_justification } = request.body;
+
+    const updateUgRegistrationService = container.resolve(UpdateUgRegistrationService);
+
+    const ugRegistration = await updateUgRegistrationService.execute({
+      id: Number(id),
+      status,
+      status_justification,
+      user: request.user,
+    })
+
+    return response.json(ugRegistration);
+  }
+
+  public async show(request: Request, response: Response): Promise<Response> {
+    const { id } = request.params;
+
+    const showUgRegistrationService = container.resolve(ShowUgRegistrationService);
+
+    const ugRegistration = await showUgRegistrationService.execute({
+      id: Number(id),
+      user: request.user,
+    });
+
+    return response.json(classToClass(ugRegistration));
   }
 }

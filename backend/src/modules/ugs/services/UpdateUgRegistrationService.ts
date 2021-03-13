@@ -6,10 +6,10 @@ import UgRegistration from '../infra/typeorm/entities/UgRegistration';
 import IUgsRegistrationsRepository from '../repositories/IUgsRegistrationsRepository';
 
 interface IRequest {
-  user: User;
-  ug_registration_id: number;
+  id: number;
   status: string;
   status_justification: string;
+  user: User;
 }
 
 @injectable()
@@ -20,13 +20,13 @@ class UpdateUgRegistrationService {
   ) {}
 
   public async execute({
+    id,
     user,
-    ug_registration_id,
     status,
     status_justification,
   }: IRequest): Promise<UgRegistration> {
     const ugRegistration = await this.ugsRegistrationsRepository.findById(
-      ug_registration_id,
+      id,
     );
 
     if (!ugRegistration) {

@@ -25,4 +25,9 @@ ugsRegistrationsRoutes.post(
   ugsRegistrationsController.create,
 );
 
+ugsRegistrationsRoutes.get(
+  '/:id', 
+  ensureAuthenticated, 
+  ugsRegistrationsController.show);
+
 export default ugsRegistrationsRoutes;

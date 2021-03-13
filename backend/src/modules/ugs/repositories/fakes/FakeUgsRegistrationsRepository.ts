@@ -77,6 +77,7 @@ class FakeUgsRegistrationsRepository implements IUgsRegistrationsRepository {
     expense_ordinator_email,
     user_id,
     ug_id,
+    files,
   }: ICreateUgRegistrationDTO): Promise<UgRegistration> {
     const ugRegistration = new UgRegistration();
 
@@ -105,6 +106,7 @@ class FakeUgsRegistrationsRepository implements IUgsRegistrationsRepository {
       expense_ordinator_email,
       user_id,
       ug_id,
+      files,
     });
 
     this.ugsRegistrations.push(ugRegistration);

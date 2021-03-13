@@ -10,6 +10,7 @@ import UserShow from '../pages/User/Show';
 
 import UgRegisterList from '../pages/Ug/Register/List';
 import UgRegisterCreate from '../pages/Ug/Register/Create';
+import UgRegisterShow from '../pages/Ug/Register/Show';
 
 const Routes: React.FC = () => {
   return (
@@ -29,6 +30,8 @@ const Routes: React.FC = () => {
         path="/ugs/registers/create"
         component={UgRegisterCreate}
       />
+
+      <Route isPrivate path="/ugs/registers/:id" component={UgRegisterShow} />
     </Switch>
   );
 };

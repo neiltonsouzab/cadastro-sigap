@@ -131,6 +131,13 @@ const UserList: React.FC = () => {
     history.push('/ugs/registers/create');
   }, [history]);
 
+  const handleNavigateToUgRegisterShow = useCallback(
+    (id: number) => {
+      history.push(`/ugs/registers/${id}`);
+    },
+    [history],
+  );
+
   return (
     <Box paddingY={4} paddingX={4}>
       <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -240,7 +247,11 @@ const UserList: React.FC = () => {
                       />
                     </TableCell>
                     <TableCell align="center">
-                      <IconButton>
+                      <IconButton
+                        onClick={() =>
+                          handleNavigateToUgRegisterShow(ugRegistration.id)
+                        }
+                      >
                         <Search color="primary" />
                       </IconButton>
                     </TableCell>

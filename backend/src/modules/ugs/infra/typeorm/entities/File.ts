@@ -1,3 +1,4 @@
+import { Expose } from 'class-transformer';
 import {
   Column,
   Entity,
@@ -30,6 +31,11 @@ class File {
   @ManyToOne(() => UgRegistration, ug_registration => ug_registration.files)
   @JoinColumn({ name: 'ug_registration_id' })
   ug_registration: UgRegistration;
+
+  @Expose({ name: 'url' })
+  getUrl(): string {
+    return `${process.env.APP_API_URL}/files/${this.name}`;
+  }
 }
 
 export default File;

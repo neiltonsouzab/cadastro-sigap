@@ -179,7 +179,9 @@ const Create: React.FC = () => {
         formData.append('district', data.district);
         formData.append('cep', data.cep);
         formData.append('email', data.email);
+        formData.append('phone', data.phone);
         formData.append('site', data.site);
+        formData.append('obs', data.obs);
         formData.append('expense_ordinator_cpf', data.expense_ordinator_cpf);
         formData.append('expense_ordinator_name', data.expense_ordinator_name);
         formData.append(

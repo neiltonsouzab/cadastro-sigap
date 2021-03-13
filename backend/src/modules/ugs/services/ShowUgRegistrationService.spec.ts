@@ -1,22 +1,21 @@
-import FakeUsersRepository from '@modules/users/repositories/fakes/FakeUsersRepository';
-import AppError from '@shared/errors/AppError';
-import FakeUgsRegistrationsRepository from '../repositories/fakes/FakeUgsRegistrationsRepository';
-import UpdateUgRegistrationService from './UpdateUgRegistrationService';
+import FakeUsersRepository from "@modules/users/repositories/fakes/FakeUsersRepository";
+import AppError from "@shared/errors/AppError";
+import FakeUgsRegistrationsRepository from "../repositories/fakes/FakeUgsRegistrationsRepository";
+import ShowUgRegistrationService from "./ShowUgRegistrationService";
 
 let fakeUgsRegistrationsRepository: FakeUgsRegistrationsRepository;
 let fakeUsersRepository: FakeUsersRepository;
-let updateUgRegistrationService: UpdateUgRegistrationService;
+let showUgRegistrationService: ShowUgRegistrationService;
 
-describe('UpdateUgRegistration', () => {
+describe('ShowUgRegistration', () => {
   beforeEach(() => {
     fakeUgsRegistrationsRepository = new FakeUgsRegistrationsRepository();
     fakeUsersRepository = new FakeUsersRepository();
-    updateUgRegistrationService = new UpdateUgRegistrationService(
-      fakeUgsRegistrationsRepository,
-    );
+    showUgRegistrationService = 
+      new ShowUgRegistrationService(fakeUgsRegistrationsRepository);
   });
 
-  it('should be able update the ug registration', async () => {
+  it('should be able show a ug registration', async () => {
     const user = await fakeUsersRepository.create({
       cpf: '111.111.111-11',
       name: 'John Doe',
@@ -27,12 +26,15 @@ describe('UpdateUgRegistration', () => {
         {
           id: 1,
         },
+        {
+          id: 2,
+        },
       ],
     });
 
-    const ugRegistration = await fakeUgsRegistrationsRepository.create({
+    const { id } = await fakeUgsRegistrationsRepository.create({
+      code:  '1111',
       cnpj: '11.111.111/1111-11',
-      code: '1111',
       name: 'Name',
       fantasy_name: 'FantasyName',
       address: 'Address',
@@ -59,22 +61,17 @@ describe('UpdateUgRegistration', () => {
           original_name: 'original-name',
           content_type: 'content-type',
           size: 10,
-          from: 'from',
+          from: 'type',
         },
       ],
     });
 
-    const updatedUgRegistration = await updateUgRegistrationService.execute({
-      ug_registration_id: ugRegistration.id,
-      status: 'APROVADO',
-      status_justification: 'APROVADO PARA SIGAP',
-      user,
-    });
+    const ugRegistration = await showUgRegistrationService.execute({ id, user });
 
-    expect(updatedUgRegistration.status).toEqual('APROVADO');
-  });
+    expect(ugRegistration).toHaveProperty('id');
+  })
 
-  it('should not be able update a non-existing ug registration', async () => {
+  it('should not be able to show non-existent ug registration', async () => {
     const user = await fakeUsersRepository.create({
       cpf: '111.111.111-11',
       name: 'John Doe',
@@ -84,21 +81,19 @@ describe('UpdateUgRegistration', () => {
       ugs: [
         {
           id: 1,
+        },
+        {
+          id: 2,
         },
       ],
     });
 
     await expect(
-      updateUgRegistrationService.execute({
-        ug_registration_id: 1111,
-        status: 'APROVADO',
-        status_justification: 'APROVADO PARA SIGAP',
-        user,
-      }),
-    ).rejects.toBeInstanceOf(AppError);
-  });
+      showUgRegistrationService.execute({ id: 10, user })
+    ).rejects.toBeInstanceOf(AppError)
+  })
 
-  it('should not be able update the ug registration ug not authorized for user', async () => {
+  it('should not be able to show ug registration for ug not authorized', async () => {
     const user = await fakeUsersRepository.create({
       cpf: '111.111.111-11',
       name: 'John Doe',
@@ -109,12 +104,15 @@ describe('UpdateUgRegistration', () => {
         {
           id: 1,
         },
+        {
+          id: 2,
+        },
       ],
     });
-
-    const ugRegistration = await fakeUgsRegistrationsRepository.create({
+    
+    const { id } = await fakeUgsRegistrationsRepository.create({
+      code:  '1111',
       cnpj: '11.111.111/1111-11',
-      code: '11111',
       name: 'Name',
       fantasy_name: 'FantasyName',
       address: 'Address',
@@ -133,26 +131,22 @@ describe('UpdateUgRegistration', () => {
       expense_ordinator_cpf: '111.111.111-11',
       expense_ordinator_name: 'OrdinatorName',
       expense_ordinator_email: 'OrdinatorEmail',
-      user_id: 2,
-      ug_id: 2,
+      user_id: 10,
+      ug_id: 3,
       files: [
         {
           name: 'file-name',
           original_name: 'original-name',
           content_type: 'content-type',
           size: 10,
-          from: 'ordinator',
+          from: 'type',
         },
       ],
     });
 
-    await expect(
-      updateUgRegistrationService.execute({
-        ug_registration_id: ugRegistration.id,
-        status: 'APROVADO',
-        status_justification: 'APROVADO PARA SIGAP',
-        user,
-      }),
-    ).rejects.toBeInstanceOf(AppError);
-  });
+    await expect(showUgRegistrationService.execute({
+      id,
+      user
+    })).rejects.toBeInstanceOf(AppError);
+  })
 });
