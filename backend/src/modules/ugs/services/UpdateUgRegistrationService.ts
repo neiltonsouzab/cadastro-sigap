@@ -41,6 +41,10 @@ class UpdateUgRegistrationService {
       throw new AppError('Usuário não tem autorização para esta UG.');
     }
 
+    if (ugRegistration.status !== 'ANALISE') {
+      throw new AppError(`Só é possível ${status} um registro que esteja em ANALISE.`);
+    }
+
     ugRegistration.user_update_id = user.id;
     ugRegistration.status = status;
     ugRegistration.status_justification = status_justification;

@@ -227,6 +227,10 @@ const Create: React.FC = () => {
     [history, addToast, ugFiles, ordinatorFiles],
   );
 
+  const handleNavigateToUgRegistrationList = useCallback(() => {
+    history.push('/ugs/registrations');
+  }, [history]);
+
   return (
     <Formik
       onSubmit={handleSubmit}
@@ -289,7 +293,7 @@ const Create: React.FC = () => {
                 </Box>
 
                 <Box marginLeft={2}>
-                  <IconButton>
+                  <IconButton onClick={handleNavigateToUgRegistrationList}>
                     <ArrowBack fontSize="large" color="primary" />
                   </IconButton>
                 </Box>

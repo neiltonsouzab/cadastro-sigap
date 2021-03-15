@@ -23,15 +23,24 @@ const Routes: React.FC = () => {
 
       <Route isPrivate path="/users/:id" component={UserShow} />
 
-      <Route isPrivate exact path="/ugs/registers" component={UgRegisterList} />
+      <Route
+        isPrivate
+        exact
+        path="/ugs/registrations"
+        component={UgRegisterList}
+      />
 
       <Route
         isPrivate
-        path="/ugs/registers/create"
+        path="/ugs/registrations/create"
         component={UgRegisterCreate}
       />
 
-      <Route isPrivate path="/ugs/registers/:id" component={UgRegisterShow} />
+      <Route
+        isPrivate
+        path="/ugs/registrations/:id"
+        component={UgRegisterShow}
+      />
     </Switch>
   );
 };

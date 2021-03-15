@@ -128,12 +128,12 @@ const UserList: React.FC = () => {
   }, [user.ugs, selectedsUgs]);
 
   const handleNavigateToUgRegisterCreate = useCallback(() => {
-    history.push('/ugs/registers/create');
+    history.push('/ugs/registrations/create');
   }, [history]);
 
   const handleNavigateToUgRegisterShow = useCallback(
     (id: number) => {
-      history.push(`/ugs/registers/${id}`);
+      history.push(`/ugs/registrations/${id}`);
     },
     [history],
   );

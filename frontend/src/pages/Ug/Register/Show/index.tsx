@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import {
   Box,
   Typography,
@@ -22,6 +22,9 @@ import {
   DialogContentText,
   DialogActions,
   Button,
+  Chip,
+  CircularProgress,
+  Link,
 } from '@material-ui/core';
 import {
   ArrowBack,
@@ -35,6 +38,7 @@ import { format, parseISO } from 'date-fns';
 import InputText from '../../../../components/InputText';
 
 import api from '../../../../services/api';
+import { useToast } from '../../../../hooks/toast';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -43,6 +47,18 @@ const useStyles = makeStyles((theme: Theme) =>
     },
     iconDanger: {
       color: theme.palette.error.main,
+    },
+    chipSuccess: {
+      backgroundColor: theme.palette.success.main,
+      color: '#FFF',
+    },
+    chipDanger: {
+      backgroundColor: theme.palette.error.main,
+      color: '#FFF',
+    },
+    chipDefault: {
+      backgroundColor: theme.palette.primary.main,
+      color: '#FFF',
     },
   }),
 );
@@ -89,18 +105,28 @@ interface UgRegistration {
     short_name: string;
     name: string;
   };
+  user: {
+    nickname: string;
+  };
   files: File[];
+  status: string;
+  updated_at: string;
 }
 
 const Show: React.FC = () => {
   const styles = useStyles();
-
   const params = useParams();
+  const history = useHistory();
+  const { addToast } = useToast();
+
   const { id } = params as RouteParams;
 
   const [ugRegistration, setUgRegistration] = useState<UgRegistration>();
   const [ugFiles, setUgFiles] = useState<File[]>([]);
   const [ordinatorFiles, setOrdinatorFiles] = useState<File[]>([]);
+
+  const [loadingApproval, setLoadingApproval] = useState(false);
+  const [loadingRefusal, setLoadingRefusal] = useState(false);
 
   const [openApprovalDialog, setOpenApprovalDialog] = useState(false);
   const [openRefusalDialog, setOpenRefusalDialog] = useState(false);
@@ -117,19 +143,44 @@ const Show: React.FC = () => {
       setUgRegistration({
         ...data,
         open_date: format(parseISO(data.open_date), 'dd/MM/yyyy'),
+        updated_at: format(parseISO(data.updated_at), 'dd/MM/yyyy HH:mm:ss'),
       });
     };
 
     loadUgRegistration();
   }, [id]);
 
-  const handleAprroval = useCallback(() => {
-    console.log('Aprovado!');
-  }, []);
+  const handleAprroval = useCallback(async () => {
+    setLoadingApproval(true);
+
+    const { data } = await api.put<UgRegistration>(`/ugs-registrations/${id}`, {
+      status: 'APROVADO',
+      status_justification: 'Sem justificativa.',
+    });
+
+    setUgRegistration({
+      ...data,
+      open_date: format(parseISO(data.open_date), 'dd/MM/yyyy'),
+      updated_at: format(parseISO(data.updated_at), 'dd/MM/yyyy HH:mm:ss'),
+    });
+
+    setLoadingApproval(false);
+    setOpenApprovalDialog(false);
+
+    addToast({
+      type: 'success',
+      title: 'Deu tudo certo!',
+      description: 'O registro foi aprovado com sucesso!',
+    });
+  }, [id, addToast]);
 
   const handleRefusal = useCallback(() => {
     console.log('Reprovado!');
   }, []);
+
+  const handleNavigateToUgRegistrationList = useCallback(() => {
+    history.push('/ugs/registrations');
+  }, [history]);
 
   if (!ugRegistration) {
     return <></>;
@@ -147,22 +198,62 @@ const Show: React.FC = () => {
           </Typography>
         </Box>
 
-        <Box display="flex" alignItems="center">
-          <Tooltip title="Aprovar">
-            <IconButton onClick={() => setOpenApprovalDialog(true)}>
-              <CheckCircle fontSize="large" className={styles.iconSuccess} />
-            </IconButton>
-          </Tooltip>
+        <Box display="flex" flexDirection="column" alignItems="flex-end">
+          <Box>
+            <Chip
+              label={ugRegistration.status}
+              className={
+                ugRegistration.status === 'APROVADO'
+                  ? styles.chipSuccess
+                  : ugRegistration.status === 'RECUSADO'
+                  ? styles.chipDanger
+                  : styles.chipDefault
+              }
+            />
 
-          <Tooltip title="Recusar">
-            <IconButton onClick={() => setOpenRefusalDialog(true)}>
-              <Cancel fontSize="large" className={styles.iconDanger} />
-            </IconButton>
-          </Tooltip>
+            {ugRegistration.status === 'ANALISE' && (
+              <>
+                <Tooltip title="Aprovar">
+                  <IconButton onClick={() => setOpenApprovalDialog(true)}>
+                    <CheckCircle
+                      fontSize="large"
+                      className={styles.iconSuccess}
+                    />
+                  </IconButton>
+                </Tooltip>
 
-          <IconButton>
-            <ArrowBack fontSize="large" color="primary" />
-          </IconButton>
+                <Tooltip title="Recusar">
+                  <IconButton onClick={() => setOpenRefusalDialog(true)}>
+                    <Cancel fontSize="large" className={styles.iconDanger} />
+                  </IconButton>
+                </Tooltip>
+              </>
+            )}
+
+            <IconButton onClick={handleNavigateToUgRegistrationList}>
+              <ArrowBack fontSize="large" color="primary" />
+            </IconButton>
+          </Box>
+
+          {ugRegistration.status !== 'ANALISE' && (
+            <Box display="flex" flexDirection="column" alignItems="flex-end">
+              <Typography variant="body2" color="textSecondary">
+                Analisado por {ugRegistration.user.nickname} em{' '}
+                {ugRegistration.updated_at}
+              </Typography>
+
+              <Link
+                component="button"
+                variant="body2"
+                color="secondary"
+                onClick={() => {
+                  console.info("I'm a button.");
+                }}
+              >
+                Ver justificativa
+              </Link>
+            </Box>
+          )}
         </Box>
       </Box>
 
@@ -468,8 +559,13 @@ const Show: React.FC = () => {
           <Button onClick={() => setOpenApprovalDialog(false)} color="primary">
             CANCELAR
           </Button>
-          <Button onClick={handleAprroval} color="primary" autoFocus>
-            SIM
+          <Button
+            disabled={loadingApproval}
+            onClick={handleAprroval}
+            color="primary"
+            autoFocus
+          >
+            {loadingApproval ? <CircularProgress size={24} /> : 'SIM'}
           </Button>
         </DialogActions>
       </Dialog>
@@ -492,7 +588,7 @@ const Show: React.FC = () => {
           <Button onClick={() => setOpenRefusalDialog(false)} color="primary">
             CANCELAR
           </Button>
-          <Button onClick={handleAprroval} color="primary" autoFocus>
+          <Button onClick={handleRefusal} color="primary" autoFocus>
             SIM
           </Button>
         </DialogActions>

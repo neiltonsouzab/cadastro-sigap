@@ -20,10 +20,17 @@ ugsRegistrationsRoutes.get(
 ugsRegistrationsRoutes.post(
   '/',
   ensureAuthenticated,
-  ensureAuthorized(['ADMINISTRATOR', 'CONTADOR']),
+  ensureAuthorized(['ADMINISTRATOR', 'CONTADOR', 'OPERATOR']),
   upload.fields([{ name: 'file1', maxCount: 2 }, { name: 'file2', maxCount: 2 }]),
   ugsRegistrationsController.create,
 );
+
+ugsRegistrationsRoutes.put(
+    '/:id', 
+    ensureAuthenticated, 
+    ensureAuthorized(['ADMINISTRATOR', 'OPERATOR']),
+    ugsRegistrationsController.update,
+  );
 
 ugsRegistrationsRoutes.get(
   '/:id', 

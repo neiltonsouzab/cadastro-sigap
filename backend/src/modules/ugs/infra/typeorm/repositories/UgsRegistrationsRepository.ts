@@ -16,7 +16,7 @@ class UgsRegistrationsRepository implements IUgsRegistrationsRepository {
 
   public async findById(id: number): Promise<UgRegistration | undefined> {
     const ugRegistration = await this.ormRepository.findOne(id, {
-      relations: ['ug', 'files'],
+      relations: ['ug', 'user', 'files'],
     });
 
     return ugRegistration;
