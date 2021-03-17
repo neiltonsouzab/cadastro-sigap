@@ -29,6 +29,7 @@ import qs from 'qs';
 
 import api from '../../../../services/api';
 import { useAuth } from '../../../../hooks/auth';
+import { UgRegistration, Ug } from '../../../../models';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -47,27 +48,12 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-interface Ug {
-  id: number;
-  code: string;
-  name: string;
-  short_name: string;
-}
-
-interface UgRegistration {
-  id: number;
-  ug: Ug;
-  status: 'ANALISE' | 'REJEITADO' | 'APROVADO';
-  created_at: string;
-  updated_at: string;
-}
-
 const UserList: React.FC = () => {
   const classes = useStyles();
 
   const status = {
     ANALISE: classes.chipDefault,
-    REJEITADO: classes.chipDanger,
+    RECUSADO: classes.chipDanger,
     APROVADO: classes.chipSuccess,
   };
 
@@ -238,7 +224,8 @@ const UserList: React.FC = () => {
                       {ugRegistration.created_at}
                     </TableCell>
                     <TableCell align="center">
-                      {ugRegistration.updated_at}
+                      {ugRegistration.status !== 'ANALISE' &&
+                        ugRegistration.updated_at}
                     </TableCell>
                     <TableCell align="center">
                       <Chip

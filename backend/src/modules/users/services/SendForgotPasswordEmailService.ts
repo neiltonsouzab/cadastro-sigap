@@ -43,7 +43,7 @@ class SendForgotPasswordEmailService {
       'forgot_password.hbs',
     );
 
-    this.mailProvider.sendMail({
+    await this.mailProvider.sendMail({
       to: {
         name: user.name,
         address: user.email,

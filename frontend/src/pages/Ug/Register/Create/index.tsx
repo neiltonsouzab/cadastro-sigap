@@ -43,7 +43,7 @@ interface MyFile extends File {
   uuid: string;
 }
 
-interface UgRegister {
+interface UgRegistration {
   type: string;
   ug_id: number | undefined;
   code: string;
@@ -135,7 +135,7 @@ const Create: React.FC = () => {
   }, []);
 
   const handleSubmit = useCallback(
-    async (data: UgRegister) => {
+    async (data: UgRegistration) => {
       try {
         if (ugFiles.length === 0) {
           addToast({
@@ -200,14 +200,14 @@ const Create: React.FC = () => {
           description: 'Registro enviado com sucesso.',
         });
 
-        history.push('/ugs/registers');
+        history.push('/ugs/registrations');
       } catch (error) {
         const errorResponse = error.response;
 
-        if (errorResponse.status !== 400) {
+        if (errorResponse.status === 500) {
           addToast({
             type: 'error',
-            title: 'Algo deu errado!',
+            title: 'Algo de errado aconteceu!',
             description:
               'Não conseguimos processar sua requisição, tente novamente.',
           });
@@ -217,7 +217,7 @@ const Create: React.FC = () => {
 
         addToast({
           type: 'error',
-          title: 'Algo deu errado!',
+          title: 'Algo de errado aconteceu!',
           description: errorResponse.data.message as string,
         });
 

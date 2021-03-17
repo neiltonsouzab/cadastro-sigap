@@ -34,11 +34,14 @@ import {
   Cancel,
 } from '@material-ui/icons';
 import { format, parseISO } from 'date-fns';
+import { Formik, Form, Field, FieldProps } from 'formik';
+import * as Yup from 'yup';
 
 import InputText from '../../../../components/InputText';
-
 import api from '../../../../services/api';
 import { useToast } from '../../../../hooks/toast';
+import { useAuth } from '../../../../hooks/auth';
+import { UgRegistration, File } from '../../../../models';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -67,69 +70,40 @@ interface RouteParams {
   id: number;
 }
 
-interface File {
-  id: number;
-  name: string;
-  original_name: string;
-  content_type: string;
-  size: number;
-  from: string;
-  url: string;
+interface RefusalData {
+  status_justification: string;
 }
 
-interface UgRegistration {
-  id: string;
-  type: string;
-  code: string;
-  short_name: string;
-  name: string;
-  cnpj: string;
-  fantasy_name: string;
-  open_date: string;
-  legal_nature_code: string;
-  address: string;
-  number: string;
-  complement: string;
-  district: string;
-  cep: string;
-  email: string;
-  phone: string;
-  site: string;
-  obs: string;
-  expense_ordinator_cpf: string;
-  expense_ordinator_name: string;
-  expense_ordinator_email: string;
-  ug: {
-    id: number;
-    code: string;
-    short_name: string;
-    name: string;
-  };
-  user: {
-    nickname: string;
-  };
-  files: File[];
-  status: string;
-  updated_at: string;
-}
+const validationSchema = Yup.object({
+  status_justification: Yup.string().required(
+    'Você deve justificar o motivo da recusa.',
+  ),
+});
 
 const Show: React.FC = () => {
   const styles = useStyles();
   const params = useParams();
   const history = useHistory();
   const { addToast } = useToast();
+  const { user } = useAuth();
 
   const { id } = params as RouteParams;
+
+  const statusStyles = {
+    ANALISE: styles.chipDefault,
+    RECUSADO: styles.chipDanger,
+    APROVADO: styles.chipSuccess,
+  };
 
   const [ugRegistration, setUgRegistration] = useState<UgRegistration>();
   const [ugFiles, setUgFiles] = useState<File[]>([]);
   const [ordinatorFiles, setOrdinatorFiles] = useState<File[]>([]);
 
   const [loadingApproval, setLoadingApproval] = useState(false);
-  const [loadingRefusal, setLoadingRefusal] = useState(false);
 
   const [openApprovalDialog, setOpenApprovalDialog] = useState(false);
   const [openRefusalDialog, setOpenRefusalDialog] = useState(false);
+  const [openJustificationDialog, setOpenJustificationDialog] = useState(false);
 
   useEffect(() => {
     const loadUgRegistration = async (): Promise<void> => {
@@ -151,32 +125,104 @@ const Show: React.FC = () => {
   }, [id]);
 
   const handleAprroval = useCallback(async () => {
-    setLoadingApproval(true);
+    try {
+      setLoadingApproval(true);
 
-    const { data } = await api.put<UgRegistration>(`/ugs-registrations/${id}`, {
-      status: 'APROVADO',
-      status_justification: 'Sem justificativa.',
-    });
+      const { data } = await api.put<UgRegistration>(
+        `/ugs-registrations/${id}`,
+        {
+          status: 'APROVADO',
+          status_justification: 'Sem justificativa.',
+        },
+      );
 
-    setUgRegistration({
-      ...data,
-      open_date: format(parseISO(data.open_date), 'dd/MM/yyyy'),
-      updated_at: format(parseISO(data.updated_at), 'dd/MM/yyyy HH:mm:ss'),
-    });
+      setUgRegistration({
+        ...data,
+        open_date: format(parseISO(data.open_date), 'dd/MM/yyyy'),
+        updated_at: format(parseISO(data.updated_at), 'dd/MM/yyyy HH:mm:ss'),
+      });
 
-    setLoadingApproval(false);
-    setOpenApprovalDialog(false);
+      setLoadingApproval(false);
+      setOpenApprovalDialog(false);
 
-    addToast({
-      type: 'success',
-      title: 'Deu tudo certo!',
-      description: 'O registro foi aprovado com sucesso!',
-    });
+      addToast({
+        type: 'success',
+        title: 'Deu tudo certo!',
+        description: 'O registro foi aprovado com sucesso!',
+      });
+    } catch (error) {
+      const errorResponse = error.response;
+
+      if (errorResponse.status !== 500) {
+        addToast({
+          type: 'error',
+          title: 'Algo de errado aconteceu!',
+          description:
+            'Não conseguimos processar sua requisição, tente novamente.',
+        });
+
+        return;
+      }
+
+      addToast({
+        type: 'error',
+        title: 'Algo de errado aconteceu!',
+        description: errorResponse.data.message as string,
+      });
+
+      return;
+    }
   }, [id, addToast]);
 
-  const handleRefusal = useCallback(() => {
-    console.log('Reprovado!');
-  }, []);
+  const handleRefusal = useCallback(
+    async ({ status_justification }: RefusalData) => {
+      try {
+        const { data } = await api.put<UgRegistration>(
+          `/ugs-registrations/${id}`,
+          {
+            status: 'RECUSADO',
+            status_justification,
+          },
+        );
+
+        setUgRegistration({
+          ...data,
+          open_date: format(parseISO(data.open_date), 'dd/MM/yyyy'),
+          updated_at: format(parseISO(data.updated_at), 'dd/MM/yyyy HH:mm:ss'),
+        });
+
+        setOpenRefusalDialog(false);
+
+        addToast({
+          type: 'success',
+          title: 'Deu tudo certo!',
+          description: 'O registro foi recusado com sucesso!',
+        });
+      } catch (error) {
+        const errorResponse = error.response;
+
+        if (errorResponse.status === 500) {
+          addToast({
+            type: 'error',
+            title: 'Algo de errado aconteceu!',
+            description:
+              'Não conseguimos processar sua requisição, tente novamente.',
+          });
+
+          return;
+        }
+
+        addToast({
+          type: 'error',
+          title: 'Algo de errado aconteceu!',
+          description: errorResponse.data.message as string,
+        });
+
+        return;
+      }
+    },
+    [id, addToast],
+  );
 
   const handleNavigateToUgRegistrationList = useCallback(() => {
     history.push('/ugs/registrations');
@@ -202,33 +248,28 @@ const Show: React.FC = () => {
           <Box>
             <Chip
               label={ugRegistration.status}
-              className={
-                ugRegistration.status === 'APROVADO'
-                  ? styles.chipSuccess
-                  : ugRegistration.status === 'RECUSADO'
-                  ? styles.chipDanger
-                  : styles.chipDefault
-              }
+              className={statusStyles[ugRegistration.status]}
             />
 
-            {ugRegistration.status === 'ANALISE' && (
-              <>
-                <Tooltip title="Aprovar">
-                  <IconButton onClick={() => setOpenApprovalDialog(true)}>
-                    <CheckCircle
-                      fontSize="large"
-                      className={styles.iconSuccess}
-                    />
-                  </IconButton>
-                </Tooltip>
+            {ugRegistration.status === 'ANALISE' &&
+              (user.type === 'ADMINISTRATOR' || user.type === 'OPERATOR') && (
+                <>
+                  <Tooltip title="Aprovar">
+                    <IconButton onClick={() => setOpenApprovalDialog(true)}>
+                      <CheckCircle
+                        fontSize="large"
+                        className={styles.iconSuccess}
+                      />
+                    </IconButton>
+                  </Tooltip>
 
-                <Tooltip title="Recusar">
-                  <IconButton onClick={() => setOpenRefusalDialog(true)}>
-                    <Cancel fontSize="large" className={styles.iconDanger} />
-                  </IconButton>
-                </Tooltip>
-              </>
-            )}
+                  <Tooltip title="Recusar">
+                    <IconButton onClick={() => setOpenRefusalDialog(true)}>
+                      <Cancel fontSize="large" className={styles.iconDanger} />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              )}
 
             <IconButton onClick={handleNavigateToUgRegistrationList}>
               <ArrowBack fontSize="large" color="primary" />
@@ -242,16 +283,16 @@ const Show: React.FC = () => {
                 {ugRegistration.updated_at}
               </Typography>
 
-              <Link
-                component="button"
-                variant="body2"
-                color="secondary"
-                onClick={() => {
-                  console.info("I'm a button.");
-                }}
-              >
-                Ver justificativa
-              </Link>
+              {ugRegistration.status === 'RECUSADO' && (
+                <Link
+                  component="button"
+                  variant="body2"
+                  color="secondary"
+                  onClick={() => setOpenJustificationDialog(true)}
+                >
+                  Ver justificativa
+                </Link>
+              )}
             </Box>
           )}
         </Box>
@@ -574,22 +615,75 @@ const Show: React.FC = () => {
         open={openRefusalDialog}
         onClose={() => setOpenRefusalDialog(false)}
       >
-        <DialogTitle>Registro de UG - Recusar</DialogTitle>
+        <Formik
+          validationSchema={validationSchema}
+          onSubmit={handleRefusal}
+          initialValues={{
+            status_justification: '',
+          }}
+        >
+          {({ isSubmitting }) => (
+            <Form>
+              <DialogTitle>Registro de UG - Recusar</DialogTitle>
+              <DialogContent>
+                <DialogContentText>
+                  Você tem certeza que deseja recusar o registro enviado pela
+                  ug? Esta operação não poderá ser desfeita.
+                </DialogContentText>
+
+                <Field name="status_justification">
+                  {({ field, meta }: FieldProps) => (
+                    <InputText
+                      multiline
+                      required
+                      rows={4}
+                      label="Justificativa"
+                      {...field}
+                      errors={meta.error}
+                      touched={meta.touched}
+                    />
+                  )}
+                </Field>
+              </DialogContent>
+
+              <DialogActions>
+                <Button
+                  onClick={() => setOpenRefusalDialog(false)}
+                  color="primary"
+                >
+                  CANCELAR
+                </Button>
+                <Button
+                  type="submit"
+                  color="primary"
+                  autoFocus
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? <CircularProgress size={24} /> : 'SIM'}
+                </Button>
+              </DialogActions>
+            </Form>
+          )}
+        </Formik>
+      </Dialog>
+
+      <Dialog
+        open={openJustificationDialog}
+        onClose={() => setOpenJustificationDialog(false)}
+      >
+        <DialogTitle>Justificativa</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Você tem certeza que deseja recusar o registro enviado pela ug? Esta
-            operação não poderá ser desfeita.
+            {ugRegistration.status_justification}
           </DialogContentText>
-
-          <InputText multiline rows={4} label="Observação" />
         </DialogContent>
-
         <DialogActions>
-          <Button onClick={() => setOpenRefusalDialog(false)} color="primary">
-            CANCELAR
-          </Button>
-          <Button onClick={handleRefusal} color="primary" autoFocus>
-            SIM
+          <Button
+            onClick={() => setOpenJustificationDialog(false)}
+            color="primary"
+            autoFocus
+          >
+            OK
           </Button>
         </DialogActions>
       </Dialog>

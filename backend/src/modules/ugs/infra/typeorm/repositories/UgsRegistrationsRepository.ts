@@ -53,6 +53,8 @@ class UgsRegistrationsRepository implements IUgsRegistrationsRepository {
     const pages = Math.ceil(count / perPage);
 
     query.innerJoinAndSelect('UgRegistration.ug', 'ug');
+    query.orderBy('UgRegistration.created_at', 'DESC');
+
     const data = await query.getMany();
     
     query.take(take);

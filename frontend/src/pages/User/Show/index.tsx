@@ -81,6 +81,11 @@ const Show: React.FC = () => {
   const [ugsCheckbox, setUgsCheckbox] = useState<UgCheckbox[]>([]);
   const [user, setUser] = useState<User>();
 
+  const [
+    loadingSendMailResetPassword,
+    setLoadingSendMailResetPassword,
+  ] = useState(false);
+
   useEffect(() => {
     const loadUgs = async (): Promise<void> => {
       const response = await api.get<Ug[]>('/ugs');
@@ -171,13 +176,40 @@ const Show: React.FC = () => {
 
   const handleSendMailResetPassword = useCallback(
     async (email: string) => {
-      await api.post('/password/forgot', { email });
+      try {
+        setLoadingSendMailResetPassword(true);
 
-      addToast({
-        type: 'success',
-        title: 'Deu tudo certo!',
-        description: 'Um email de alteração de senha foi enviado ao usuário',
-      });
+        await api.post('/password/forgot', { email });
+
+        addToast({
+          type: 'success',
+          title: 'Deu tudo certo!',
+          description: 'Um email de alteração de senha foi enviado ao usuário',
+        });
+      } catch (error) {
+        const errorResponse = error.response;
+
+        if (errorResponse.status === 500) {
+          addToast({
+            type: 'error',
+            title: 'Algo de errado aconteceu!',
+            description:
+              'Não conseguimos processar sua requisição, tente novamente.',
+          });
+
+          return;
+        }
+
+        addToast({
+          type: 'error',
+          title: 'Algo de errado aconteceu!',
+          description: errorResponse.data.message as string,
+        });
+
+        return;
+      } finally {
+        setLoadingSendMailResetPassword(false);
+      }
     },
     [addToast],
   );
@@ -245,7 +277,11 @@ const Show: React.FC = () => {
                     <IconButton
                       onClick={() => handleSendMailResetPassword(user.email)}
                     >
-                      <Mail fontSize="large" color="primary" />
+                      {loadingSendMailResetPassword ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        <Mail fontSize="large" color="primary" />
+                      )}
                     </IconButton>
                   </Tooltip>
                 </Box>

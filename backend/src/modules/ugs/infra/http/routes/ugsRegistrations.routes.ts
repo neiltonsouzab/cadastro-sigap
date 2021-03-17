@@ -13,14 +13,14 @@ const ugsRegistrationsController = new UgsRegistrationsController();
 ugsRegistrationsRoutes.get(
   '/',
   ensureAuthenticated,
-  ensureAuthorized(['ADMINISTRATOR', 'CONTADOR']),
+  ensureAuthorized(['ADMINISTRATOR', 'ACCOUNTANT', 'OPERATOR']),
   ugsRegistrationsController.index,
 );
 
 ugsRegistrationsRoutes.post(
   '/',
   ensureAuthenticated,
-  ensureAuthorized(['ADMINISTRATOR', 'CONTADOR', 'OPERATOR']),
+  ensureAuthorized(['ADMINISTRATOR', 'ACCOUNTANT', 'OPERATOR']),
   upload.fields([{ name: 'file1', maxCount: 2 }, { name: 'file2', maxCount: 2 }]),
   ugsRegistrationsController.create,
 );

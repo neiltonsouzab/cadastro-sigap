@@ -28,8 +28,8 @@ class PageUgRegistrationService {
     }
 
     const ugsRegistrationsPage = await this.ugsRegistrationsService.findByUgs({
-      page: 1,
-      perPage: 10,
+      page,
+      perPage,
       filter,
     });
 

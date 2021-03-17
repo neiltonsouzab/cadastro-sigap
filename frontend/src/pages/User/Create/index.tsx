@@ -23,18 +23,12 @@ import InputMask from '../../../components/InputMask';
 
 import { useToast } from '../../../hooks/toast';
 import api from '../../../services/api';
+import { Ug } from '../../../models';
 
 interface UgCheckbox {
   value: number;
   label: string;
   checked: boolean;
-}
-
-interface Ug {
-  id: number;
-  code: string;
-  name: string;
-  short_name: string;
 }
 
 const userTypes = [
@@ -108,22 +102,45 @@ const Create: React.FC = () => {
 
   const handleSubmit = useCallback(
     async (data) => {
-      const ugs = ugsCheckbox
-        .filter((item) => item.checked)
-        .map((item) => ({ id: item.value }));
+      try {
+        const ugs = ugsCheckbox
+          .filter((item) => item.checked)
+          .map((item) => ({ id: item.value }));
 
-      const response = await api.post('/users', {
-        ...data,
-        ugs,
-      });
+        const response = await api.post('/users', {
+          ...data,
+          ugs,
+        });
 
-      addToast({
-        type: 'success',
-        title: 'Deu tudo certo!',
-        description: 'O usário foi salvo com sucesso.',
-      });
+        addToast({
+          type: 'success',
+          title: 'Deu tudo certo!',
+          description: 'O usário foi salvo com sucesso.',
+        });
 
-      history.push(`/users/${response.data.id}`);
+        history.push(`/users/${response.data.id}`);
+      } catch (error) {
+        const errorResponse = error.response;
+
+        if (errorResponse.status === 500) {
+          addToast({
+            type: 'error',
+            title: 'Algo de errado aconteceu!',
+            description:
+              'Não conseguimos processar sua requisição, tente novamente.',
+          });
+
+          return;
+        }
+
+        addToast({
+          type: 'error',
+          title: 'Algo de errado aconteceu!',
+          description: errorResponse.data.message as string,
+        });
+
+        return;
+      }
     },
     [ugsCheckbox, addToast, history],
   );
