@@ -27,9 +27,9 @@ import { useHistory } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import qs from 'qs';
 
-import api from '../../../../services/api';
 import { useAuth } from '../../../../hooks/auth';
-import { UgRegistration, Ug } from '../../../../models';
+import useAPI from '../../../../hooks/api';
+import { UgRegistration } from '../../../../models';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -50,6 +50,8 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const UserList: React.FC = () => {
   const classes = useStyles();
+
+  const api = useAPI();
 
   const status = {
     ANALISE: classes.chipDefault,
@@ -99,7 +101,7 @@ const UserList: React.FC = () => {
     };
 
     loadUgsRegistrations();
-  }, [selectedsUgs]);
+  }, [selectedsUgs, api]);
 
   const isAllSelected = useMemo(() => {
     return user.ugs.length === selectedsUgs.length;

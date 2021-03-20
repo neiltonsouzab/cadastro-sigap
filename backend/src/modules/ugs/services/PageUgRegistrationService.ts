@@ -24,7 +24,7 @@ class PageUgRegistrationService {
     const userAuthorizedUg = user.ugs.find(ug => filter.includes(ug.id));
     
     if (!userAuthorizedUg) {
-      throw new AppError('Usuário sem autorização para esta UG.');
+      throw new AppError('Usuário sem autorização para esta UG.', 403);
     }
 
     const ugsRegistrationsPage = await this.ugsRegistrationsService.findByUgs({

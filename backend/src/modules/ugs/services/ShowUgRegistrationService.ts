@@ -22,13 +22,13 @@ class ShowUgRegistrationService {
     const ugRegistration = await this.ugsRegistrationsRepository.findById(id);
 
     if (!ugRegistration) {
-      throw new AppError('Ug Registration not found.');
+      throw new AppError('Ug Registration not found.', 404);
     }
     
     const userAuthorizedUg = user.ugs.find(ug => ug.id == ugRegistration.ug_id);
 
     if (!userAuthorizedUg) {
-      throw new AppError('User not authorized for this ug.');
+      throw new AppError('User not authorized for this ug.', 403);
     }
 
     return ugRegistration;

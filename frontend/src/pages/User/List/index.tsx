@@ -19,7 +19,7 @@ import {
 import { Add, Search } from '@material-ui/icons';
 import { useHistory } from 'react-router-dom';
 
-import api from '../../../services/api';
+import useAPI from '../../../hooks/api';
 
 import InputText from '../../../components/InputText';
 
@@ -49,6 +49,8 @@ const UserList: React.FC = () => {
   const classes = useStyles();
   const history = useHistory();
 
+  const api = useAPI();
+
   const [users, setUsers] = useState<User[]>([]);
 
   const [filter, setFilter] = useState('');
@@ -77,7 +79,7 @@ const UserList: React.FC = () => {
     };
 
     loadUsers();
-  }, [filter, page, perPage]);
+  }, [filter, page, perPage, api]);
 
   const handleNavigateToUserCreate = useCallback(() => {
     history.push('/users/create');

@@ -38,9 +38,9 @@ import { Formik, Form, Field, FieldProps } from 'formik';
 import * as Yup from 'yup';
 
 import InputText from '../../../../components/InputText';
-import api from '../../../../services/api';
 import { useToast } from '../../../../hooks/toast';
 import { useAuth } from '../../../../hooks/auth';
+import useAPI from '../../../../hooks/api';
 import { UgRegistration, File } from '../../../../models';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -86,6 +86,7 @@ const Show: React.FC = () => {
   const history = useHistory();
   const { addToast } = useToast();
   const { user } = useAuth();
+  const api = useAPI();
 
   const { id } = params as RouteParams;
 
@@ -122,17 +123,39 @@ const Show: React.FC = () => {
     };
 
     loadUgRegistration();
-  }, [id]);
+  }, [id, api]);
 
   const handleAprroval = useCallback(async () => {
-    try {
-      setLoadingApproval(true);
+    setLoadingApproval(true);
 
+    const { data } = await api.put<UgRegistration>(`/ugs-registrations/${id}`, {
+      status: 'APROVADO',
+      status_justification: 'Sem justificativa.',
+    });
+
+    setUgRegistration({
+      ...data,
+      open_date: format(parseISO(data.open_date), 'dd/MM/yyyy'),
+      updated_at: format(parseISO(data.updated_at), 'dd/MM/yyyy HH:mm:ss'),
+    });
+
+    setLoadingApproval(false);
+    setOpenApprovalDialog(false);
+
+    addToast({
+      type: 'success',
+      title: 'Deu tudo certo!',
+      description: 'O registro foi aprovado com sucesso!',
+    });
+  }, [id, addToast, api]);
+
+  const handleRefusal = useCallback(
+    async ({ status_justification }: RefusalData) => {
       const { data } = await api.put<UgRegistration>(
         `/ugs-registrations/${id}`,
         {
-          status: 'APROVADO',
-          status_justification: 'Sem justificativa.',
+          status: 'RECUSADO',
+          status_justification,
         },
       );
 
@@ -142,86 +165,15 @@ const Show: React.FC = () => {
         updated_at: format(parseISO(data.updated_at), 'dd/MM/yyyy HH:mm:ss'),
       });
 
-      setLoadingApproval(false);
-      setOpenApprovalDialog(false);
+      setOpenRefusalDialog(false);
 
       addToast({
         type: 'success',
         title: 'Deu tudo certo!',
-        description: 'O registro foi aprovado com sucesso!',
+        description: 'O registro foi recusado com sucesso!',
       });
-    } catch (error) {
-      const errorResponse = error.response;
-
-      if (errorResponse.status !== 500) {
-        addToast({
-          type: 'error',
-          title: 'Algo de errado aconteceu!',
-          description:
-            'Não conseguimos processar sua requisição, tente novamente.',
-        });
-
-        return;
-      }
-
-      addToast({
-        type: 'error',
-        title: 'Algo de errado aconteceu!',
-        description: errorResponse.data.message as string,
-      });
-
-      return;
-    }
-  }, [id, addToast]);
-
-  const handleRefusal = useCallback(
-    async ({ status_justification }: RefusalData) => {
-      try {
-        const { data } = await api.put<UgRegistration>(
-          `/ugs-registrations/${id}`,
-          {
-            status: 'RECUSADO',
-            status_justification,
-          },
-        );
-
-        setUgRegistration({
-          ...data,
-          open_date: format(parseISO(data.open_date), 'dd/MM/yyyy'),
-          updated_at: format(parseISO(data.updated_at), 'dd/MM/yyyy HH:mm:ss'),
-        });
-
-        setOpenRefusalDialog(false);
-
-        addToast({
-          type: 'success',
-          title: 'Deu tudo certo!',
-          description: 'O registro foi recusado com sucesso!',
-        });
-      } catch (error) {
-        const errorResponse = error.response;
-
-        if (errorResponse.status === 500) {
-          addToast({
-            type: 'error',
-            title: 'Algo de errado aconteceu!',
-            description:
-              'Não conseguimos processar sua requisição, tente novamente.',
-          });
-
-          return;
-        }
-
-        addToast({
-          type: 'error',
-          title: 'Algo de errado aconteceu!',
-          description: errorResponse.data.message as string,
-        });
-
-        return;
-      }
     },
-    [id, addToast],
+    [id, addToast, api],
   );
 
   const handleNavigateToUgRegistrationList = useCallback(() => {

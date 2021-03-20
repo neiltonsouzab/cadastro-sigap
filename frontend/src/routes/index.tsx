@@ -12,6 +12,9 @@ import UgRegisterList from '../pages/Ug/Register/List';
 import UgRegisterCreate from '../pages/Ug/Register/Create';
 import UgRegisterShow from '../pages/Ug/Register/Show';
 
+import NotFound from '../pages/NotFound';
+import Forbidden from '../pages/Forbidden';
+
 const Routes: React.FC = () => {
   return (
     <Switch>
@@ -41,6 +44,10 @@ const Routes: React.FC = () => {
         path="/ugs/registrations/:id"
         component={UgRegisterShow}
       />
+
+      <Route isPrivate={false} path="/403" component={Forbidden} />
+
+      <Route isPrivate={false} path="*" component={NotFound} />
     </Switch>
   );
 };

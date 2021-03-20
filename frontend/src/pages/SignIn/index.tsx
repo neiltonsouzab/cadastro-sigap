@@ -34,21 +34,12 @@ const SignIn: React.FC = () => {
       password: '',
     },
     onSubmit: async (data) => {
-      try {
-        await signIn({
-          cpf: data.cpf,
-          password: data.password,
-        });
+      await signIn({
+        cpf: data.cpf,
+        password: data.password,
+      });
 
-        history.push('/users');
-      } catch {
-        addToast({
-          title: 'Algo de errado aconteceu',
-          description:
-            'Ocorreu um erro ao realizar login. Cheque suas credenciais',
-          type: 'error',
-        });
-      }
+      history.push('/ugs/registrations');
     },
   });
 

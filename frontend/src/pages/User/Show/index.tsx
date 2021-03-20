@@ -26,7 +26,7 @@ import InputSwitch from '../../../components/InputSwitch';
 import Skeleton from './Skeleton';
 
 import { useToast } from '../../../hooks/toast';
-import api from '../../../services/api';
+import useAPI from '../../../hooks/api';
 
 interface UgCheckbox {
   value: number;
@@ -76,6 +76,8 @@ const Show: React.FC = () => {
   const params = useParams();
   const { id } = params as RouteParams;
 
+  const api = useAPI();
+
   const { addToast } = useToast();
 
   const [ugsCheckbox, setUgsCheckbox] = useState<UgCheckbox[]>([]);
@@ -119,7 +121,7 @@ const Show: React.FC = () => {
 
     loadUgs();
     loadUser();
-  }, [id]);
+  }, [id, api]);
 
   const handleToggleSelectUg = useCallback(
     (value: number, checked: boolean) => {
@@ -171,47 +173,24 @@ const Show: React.FC = () => {
         description: 'O usário foi salvo com sucesso.',
       });
     },
-    [ugsCheckbox, addToast, id],
+    [ugsCheckbox, addToast, id, api],
   );
 
   const handleSendMailResetPassword = useCallback(
     async (email: string) => {
-      try {
-        setLoadingSendMailResetPassword(true);
+      setLoadingSendMailResetPassword(true);
 
-        await api.post('/password/forgot', { email });
+      await api.post('/password/forgot', { email });
 
-        addToast({
-          type: 'success',
-          title: 'Deu tudo certo!',
-          description: 'Um email de alteração de senha foi enviado ao usuário',
-        });
-      } catch (error) {
-        const errorResponse = error.response;
+      addToast({
+        type: 'success',
+        title: 'Deu tudo certo!',
+        description: 'Um email de alteração de senha foi enviado ao usuário',
+      });
 
-        if (errorResponse.status === 500) {
-          addToast({
-            type: 'error',
-            title: 'Algo de errado aconteceu!',
-            description:
-              'Não conseguimos processar sua requisição, tente novamente.',
-          });
-
-          return;
-        }
-
-        addToast({
-          type: 'error',
-          title: 'Algo de errado aconteceu!',
-          description: errorResponse.data.message as string,
-        });
-
-        return;
-      } finally {
-        setLoadingSendMailResetPassword(false);
-      }
+      return setLoadingSendMailResetPassword(false);
     },
-    [addToast],
+    [addToast, api],
   );
 
   const handleNavigateToUserList = useCallback(() => {

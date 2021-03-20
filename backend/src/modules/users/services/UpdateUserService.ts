@@ -38,7 +38,7 @@ class UpdateUserService {
     const user = await this.usersRepository.findById(user_id);
 
     if (!user) {
-      throw new AppError('Usuário não encontrado.');
+      throw new AppError('Usuário não encontrado.', 404);
     }
 
     const userCpfExists = await this.usersRepository.findByCpf(cpf);

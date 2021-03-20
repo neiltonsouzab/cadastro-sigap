@@ -72,7 +72,7 @@ class CreateUgRegistrationService {
     const userAuthorizedUg = user.ugs.find(ug => ug.id == ug_id);
 
     if (!userAuthorizedUg) {
-      throw new AppError('Usuário não tem autorização para esta UG.');
+      throw new AppError('Usuário não tem autorização para esta UG.', 403);
     }
 
     const ugRegistrationAprroved = await this.ugsRegistrationsRepository.findByUgAndStatus(

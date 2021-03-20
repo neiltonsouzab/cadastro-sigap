@@ -22,7 +22,7 @@ import InputSelect from '../../../components/InputSelect';
 import InputMask from '../../../components/InputMask';
 
 import { useToast } from '../../../hooks/toast';
-import api from '../../../services/api';
+import useAPI from '../../../hooks/api';
 import { Ug } from '../../../models';
 
 interface UgCheckbox {
@@ -49,6 +49,8 @@ const Create: React.FC = () => {
   const history = useHistory();
   const { addToast } = useToast();
 
+  const api = useAPI();
+
   const [ugsCheckbox, setUgsCheckbox] = useState<UgCheckbox[]>([]);
 
   useEffect(() => {
@@ -65,7 +67,7 @@ const Create: React.FC = () => {
     };
 
     loadUgs();
-  }, []);
+  }, [api]);
 
   const handleToggleSelectUg = useCallback(
     (value: number, checked: boolean) => {
@@ -102,47 +104,24 @@ const Create: React.FC = () => {
 
   const handleSubmit = useCallback(
     async (data) => {
-      try {
-        const ugs = ugsCheckbox
-          .filter((item) => item.checked)
-          .map((item) => ({ id: item.value }));
+      const ugs = ugsCheckbox
+        .filter((item) => item.checked)
+        .map((item) => ({ id: item.value }));
 
-        const response = await api.post('/users', {
-          ...data,
-          ugs,
-        });
+      const response = await api.post('/users', {
+        ...data,
+        ugs,
+      });
 
-        addToast({
-          type: 'success',
-          title: 'Deu tudo certo!',
-          description: 'O usário foi salvo com sucesso.',
-        });
+      addToast({
+        type: 'success',
+        title: 'Deu tudo certo!',
+        description: 'O usário foi salvo com sucesso.',
+      });
 
-        history.push(`/users/${response.data.id}`);
-      } catch (error) {
-        const errorResponse = error.response;
-
-        if (errorResponse.status === 500) {
-          addToast({
-            type: 'error',
-            title: 'Algo de errado aconteceu!',
-            description:
-              'Não conseguimos processar sua requisição, tente novamente.',
-          });
-
-          return;
-        }
-
-        addToast({
-          type: 'error',
-          title: 'Algo de errado aconteceu!',
-          description: errorResponse.data.message as string,
-        });
-
-        return;
-      }
+      history.push(`/users/${response.data.id}`);
     },
-    [ugsCheckbox, addToast, history],
+    [ugsCheckbox, addToast, history, api],
   );
 
   const handleNavigateToUserList = useCallback(() => {

@@ -2,7 +2,9 @@ import React, { useContext } from 'react';
 
 import { createContext, useCallback, useState } from 'react';
 
-import api from '../services/api';
+import useAPI from '../hooks/api';
+
+// import api from '../services/api';
 import { User } from '../models';
 
 interface SignInCredentials {
@@ -24,6 +26,8 @@ interface AuthContextData {
 const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 
 const AuthProvider: React.FC = ({ children }) => {
+  const api = useAPI();
+
   const [data, setData] = useState<AuthState>(() => {
     const token = localStorage.getItem('@cadastro-sigap:token');
     const user = localStorage.getItem('@cadastro-sigap:user');
@@ -40,24 +44,27 @@ const AuthProvider: React.FC = ({ children }) => {
     return {} as AuthState;
   });
 
-  const signIn = useCallback(async ({ cpf, password }: SignInCredentials) => {
-    const response = await api.post('/sessions', {
-      cpf,
-      password,
-    });
+  const signIn = useCallback(
+    async ({ cpf, password }: SignInCredentials) => {
+      const response = await api.post('/sessions', {
+        cpf,
+        password,
+      });
 
-    const { user, token } = response.data;
+      const { user, token } = response.data;
 
-    localStorage.setItem('@cadastro-sigap:token', token);
-    localStorage.setItem('@cadastro-sigap:user', JSON.stringify(user));
+      localStorage.setItem('@cadastro-sigap:token', token);
+      localStorage.setItem('@cadastro-sigap:user', JSON.stringify(user));
 
-    api.defaults.headers.authorization = `Bearer ${token}`;
+      api.defaults.headers.authorization = `Bearer ${token}`;
 
-    setData({
-      user,
-      token,
-    });
-  }, []);
+      setData({
+        user,
+        token,
+      });
+    },
+    [api],
+  );
 
   const signOut = useCallback(async () => {
     localStorage.removeItem('@cadastro-sigap:token');

@@ -31,7 +31,7 @@ import { useHistory } from 'react-router-dom';
 
 import { useAuth } from '../../../../hooks/auth';
 import { useToast } from '../../../../hooks/toast';
-import api from '../../../../services/api';
+import useAPI from '../../../../hooks/api';
 
 import InputSelect from '../../../../components/InputSelect';
 import InputText from '../../../../components/InputText';
@@ -96,6 +96,7 @@ const validationSchema = Yup.object({
 
 const Create: React.FC = () => {
   const history = useHistory();
+  const api = useAPI();
 
   const { user } = useAuth();
   const { addToast } = useToast();
@@ -136,95 +137,69 @@ const Create: React.FC = () => {
 
   const handleSubmit = useCallback(
     async (data: UgRegistration) => {
-      try {
-        if (ugFiles.length === 0) {
-          addToast({
-            type: 'error',
-            title: 'Algo deu errado!',
-            description:
-              'Adicione ao menos 1 documento de comprovação da unidade gestora.',
-          });
-
-          return;
-        }
-
-        if (ordinatorFiles.length === 0) {
-          addToast({
-            type: 'error',
-            title: 'Algo deu errado!',
-            description:
-              'Adicione ao menos 1 documento de comprovação do ordenador.',
-          });
-
-          return;
-        }
-
-        const formData = new FormData();
-
-        formData.append('type', data.type);
-        formData.append('ug_id', String(data.ug_id));
-        formData.append('code', String(data.code));
-        formData.append('short_name', data.short_name);
-        formData.append('name', data.name);
-        formData.append('cnpj', data.cnpj);
-        formData.append('fantasy_name', data.fantasy_name);
-        formData.append(
-          'open_date',
-          parse(data.open_date, 'dd/MM/yyyy', new Date()).toISOString(),
-        );
-        formData.append('legal_nature_code', data.legal_nature_code);
-        formData.append('address', data.address);
-        formData.append('number', data.number);
-        formData.append('complement', data.complement);
-        formData.append('district', data.district);
-        formData.append('cep', data.cep);
-        formData.append('email', data.email);
-        formData.append('phone', data.phone);
-        formData.append('site', data.site);
-        formData.append('obs', data.obs);
-        formData.append('expense_ordinator_cpf', data.expense_ordinator_cpf);
-        formData.append('expense_ordinator_name', data.expense_ordinator_name);
-        formData.append(
-          'expense_ordinator_email',
-          data.expense_ordinator_email,
-        );
-
-        ugFiles.map((file) => formData.append('file1', file));
-        ordinatorFiles.map((file) => formData.append('file2', file));
-
-        await api.post('/ugs-registrations', formData);
-
-        addToast({
-          type: 'success',
-          title: 'Deu tudo certo!',
-          description: 'Registro enviado com sucesso.',
-        });
-
-        history.push('/ugs/registrations');
-      } catch (error) {
-        const errorResponse = error.response;
-
-        if (errorResponse.status === 500) {
-          addToast({
-            type: 'error',
-            title: 'Algo de errado aconteceu!',
-            description:
-              'Não conseguimos processar sua requisição, tente novamente.',
-          });
-
-          return;
-        }
-
+      if (ugFiles.length === 0) {
         addToast({
           type: 'error',
-          title: 'Algo de errado aconteceu!',
-          description: errorResponse.data.message as string,
+          title: 'Algo deu errado!',
+          description:
+            'Adicione ao menos 1 documento de comprovação da unidade gestora.',
         });
 
         return;
       }
+
+      if (ordinatorFiles.length === 0) {
+        addToast({
+          type: 'error',
+          title: 'Algo deu errado!',
+          description:
+            'Adicione ao menos 1 documento de comprovação do ordenador.',
+        });
+
+        return;
+      }
+
+      const formData = new FormData();
+
+      formData.append('type', data.type);
+      formData.append('ug_id', String(data.ug_id));
+      formData.append('code', String(data.code));
+      formData.append('short_name', data.short_name);
+      formData.append('name', data.name);
+      formData.append('cnpj', data.cnpj);
+      formData.append('fantasy_name', data.fantasy_name);
+      formData.append(
+        'open_date',
+        parse(data.open_date, 'dd/MM/yyyy', new Date()).toISOString(),
+      );
+      formData.append('legal_nature_code', data.legal_nature_code);
+      formData.append('address', data.address);
+      formData.append('number', data.number);
+      formData.append('complement', data.complement);
+      formData.append('district', data.district);
+      formData.append('cep', data.cep);
+      formData.append('email', data.email);
+      formData.append('phone', data.phone);
+      formData.append('site', data.site);
+      formData.append('obs', data.obs);
+      formData.append('expense_ordinator_cpf', data.expense_ordinator_cpf);
+      formData.append('expense_ordinator_name', data.expense_ordinator_name);
+      formData.append('expense_ordinator_email', data.expense_ordinator_email);
+
+      ugFiles.map((file) => formData.append('file1', file));
+      ordinatorFiles.map((file) => formData.append('file2', file));
+
+      await api.post('/ugs-registrations', formData);
+
+      addToast({
+        type: 'success',
+        title: 'Deu tudo certo!',
+        description: 'Registro enviado com sucesso.',
+      });
+
+      history.push('/ugs/registrations');
     },
-    [history, addToast, ugFiles, ordinatorFiles],
+    [history, addToast, ugFiles, ordinatorFiles, api],
   );
 
   const handleNavigateToUgRegistrationList = useCallback(() => {

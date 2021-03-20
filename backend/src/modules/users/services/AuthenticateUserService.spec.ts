@@ -86,4 +86,66 @@ describe('AuthenticateUser', () => {
       }),
     ).rejects.toBeInstanceOf(AppError);
   });
+
+  it('should not be able to authenticate with user blocked', async () => {
+    const user = await fakeUsersRepository.create({
+      cpf: '111.111.111-11',
+      name: 'John Doe',
+      email: 'johndoe@example.com',
+      nickname: 'John',
+      type: 'ADMINISTRATOR',
+      ugs: [
+        {
+          id: 1,
+        },
+      ],
+    });
+
+    const { token } = await fakeUsersTokenRepository.create(user.id);
+
+    await resetPasswordService.execute({
+      password: '123456',
+      token,
+    });
+
+    user.blocked = true;
+
+    await fakeUsersRepository.save(user);
+
+    await expect(authenticateUserService.execute({
+      cpf: '111.111.111-11',
+      password: '123456',
+    })).rejects.toBeInstanceOf(AppError);
+  });
+
+  it('should not be able to authenticate with user disabled', async () => {
+    const user = await fakeUsersRepository.create({
+      cpf: '111.111.111-11',
+      name: 'John Doe',
+      email: 'johndoe@example.com',
+      nickname: 'John',
+      type: 'ADMINISTRATOR',
+      ugs: [
+        {
+          id: 1,
+        },
+      ],
+    });
+
+    const { token } = await fakeUsersTokenRepository.create(user.id);
+
+    await resetPasswordService.execute({
+      password: '123456',
+      token,
+    });
+
+    user.enabled = false;
+
+    await fakeUsersRepository.save(user);
+
+    await expect(authenticateUserService.execute({
+      cpf: '111.111.111-11',
+      password: '123456',
+    })).rejects.toBeInstanceOf(AppError);
+  });
 });

@@ -34,6 +34,14 @@ class AuthenticateUserService {
       throw new AppError('CPF/Senha inválido.');
     }
 
+    if (user.blocked) {
+      throw new AppError('Usuário bloqueado.');
+    }
+
+    if (!user.enabled) {
+      throw new AppError('Usuário não habilitado.');
+    }
+
     const passwordMatched = await this.hashProvider.compareHash(
       password,
       user.password,

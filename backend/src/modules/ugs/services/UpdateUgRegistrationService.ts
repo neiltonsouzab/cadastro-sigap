@@ -30,7 +30,7 @@ class UpdateUgRegistrationService {
     );
 
     if (!ugRegistration) {
-      throw new AppError('Registro de UG não encontrado.');
+      throw new AppError('Registro de UG não encontrado.', 404);
     }
 
     const userAuthorizedUg = user.ugs.find(
@@ -38,7 +38,7 @@ class UpdateUgRegistrationService {
     );
 
     if (!userAuthorizedUg) {
-      throw new AppError('Usuário não tem autorização para esta UG.');
+      throw new AppError('Usuário não tem autorização para esta UG.', 403);
     }
 
     if (ugRegistration.status !== 'ANALISE') {
