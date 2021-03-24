@@ -43,6 +43,8 @@ import { useAuth } from '../../../../hooks/auth';
 import useAPI from '../../../../hooks/api';
 import { UgRegistration, File } from '../../../../models';
 
+import Skeleton from './Skeleton';
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     iconSuccess: {
@@ -181,7 +183,7 @@ const Show: React.FC = () => {
   }, [history]);
 
   if (!ugRegistration) {
-    return <></>;
+    return <Skeleton />;
   }
 
   return (

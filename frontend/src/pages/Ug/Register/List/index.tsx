@@ -103,18 +103,6 @@ const UserList: React.FC = () => {
     loadUgsRegistrations();
   }, [selectedsUgs, api]);
 
-  const isAllSelected = useMemo(() => {
-    return user.ugs.length === selectedsUgs.length;
-  }, [user.ugs, selectedsUgs]);
-
-  const handleToggleAllSelect = useCallback(() => {
-    if (user.ugs.length === selectedsUgs.length) {
-      setSelectedsUgs([]);
-    } else {
-      setSelectedsUgs(user.ugs.map((ug) => ug.id));
-    }
-  }, [user.ugs, selectedsUgs]);
-
   const handleNavigateToUgRegisterCreate = useCallback(() => {
     history.push('/ugs/registrations/create');
   }, [history]);
@@ -177,11 +165,6 @@ const UserList: React.FC = () => {
               ));
             }}
           >
-            <MenuItem onChange={handleToggleAllSelect}>
-              <Checkbox checked={isAllSelected} />
-              <ListItemText primary="Selectionar todas" />
-            </MenuItem>
-
             {user.ugs.map((ug) => (
               <MenuItem key={ug.id} value={ug.id} alignItems="flex-start">
                 <Checkbox checked={selectedsUgs.includes(ug.id)} />

@@ -1,18 +1,14 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import {
   Avatar,
   Box,
   Divider,
   IconButton,
+  Tooltip,
   Typography,
 } from '@material-ui/core';
-import {
-  Person,
-  ExitToApp,
-  Group,
-  AccountBalance,
-  NoteAdd,
-} from '@material-ui/icons';
+import { Person, ExitToApp, Group, NoteAdd } from '@material-ui/icons';
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
 
 import { useAuth } from '../../../hooks/auth';
@@ -30,8 +26,9 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const DefaultLayout: React.FC = ({ children }) => {
   const classes = useStyles();
+  const history = useHistory();
 
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
 
   return (
     <Box>
@@ -60,17 +57,19 @@ const DefaultLayout: React.FC = ({ children }) => {
         </Box>
 
         <Box marginRight={2} display="flex">
-          <IconButton>
-            <Group color="primary" />
-          </IconButton>
+          {user.type === 'ADMINISTRATOR' && (
+            <Tooltip title="Usuários">
+              <IconButton onClick={() => history.push('/users')}>
+                <Group color="primary" />
+              </IconButton>
+            </Tooltip>
+          )}
 
-          <IconButton>
-            <AccountBalance color="primary" />
-          </IconButton>
-
-          <IconButton>
-            <NoteAdd color="primary" />
-          </IconButton>
+          <Tooltip title="Registros de UG">
+            <IconButton onClick={() => history.push('/ugs/registrations')}>
+              <NoteAdd color="primary" />
+            </IconButton>
+          </Tooltip>
 
           <Divider
             orientation="vertical"
@@ -81,7 +80,7 @@ const DefaultLayout: React.FC = ({ children }) => {
             }}
           />
 
-          <IconButton>
+          <IconButton onClick={() => signOut()}>
             <ExitToApp color="primary" />
           </IconButton>
         </Box>
