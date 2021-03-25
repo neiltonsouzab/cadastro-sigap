@@ -6,6 +6,7 @@ import {
   CircularProgress,
   Divider,
   Grid,
+  Link,
   Typography,
 } from '@material-ui/core';
 import { useFormik } from 'formik';
@@ -15,7 +16,6 @@ import InputMask from '../../components/InputMask';
 import InputText from '../../components/InputText';
 
 import { useAuth } from '../../hooks/auth';
-import { useToast } from '../../hooks/toast';
 
 const validationSchema = Yup.object({
   cpf: Yup.string().required('CPF obrigatório.'),
@@ -25,7 +25,6 @@ const validationSchema = Yup.object({
 const SignIn: React.FC = () => {
   const history = useHistory();
   const { signIn } = useAuth();
-  const { addToast } = useToast();
 
   const formik = useFormik({
     validationSchema,
@@ -111,6 +110,14 @@ const SignIn: React.FC = () => {
               {formik.isSubmitting ? <CircularProgress size={24} /> : 'ENTRAR'}
             </Button>
           </Grid>
+
+          <Link
+            component="button"
+            variant="body2"
+            onClick={() => history.push('/forgot-password')}
+          >
+            Esqueci minha senha
+          </Link>
         </Grid>
       </Box>
     </Box>
