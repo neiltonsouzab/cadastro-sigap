@@ -9,7 +9,7 @@
     "baseUrl": "./src",
     "allowJs": true,
     "typeRoots": [
-      "node_modules/@types"
+      "node_modules/@types",
     ],
     "paths": {
       "@modules/*": ["modules/*"],
@@ -26,5 +26,5 @@
     "coverage/*",
     "prettier.config.js",
     "jest.config.js"
-  ]
+  ],
 }
