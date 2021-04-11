@@ -1,11 +1,10 @@
-import { inject, injectable } from 'tsyringe';
-import nodemailer, { Transporter } from 'nodemailer';
-
 import mailConfig from '@config/mail';
+import nodemailer, { Transporter } from 'nodemailer';
+import { inject, injectable } from 'tsyringe';
 
-import IMailProvider from '../models/IMailProvider';
-import ISendMailDTO from '../dtos/ISendMailDTO';
 import IMailTemplateProvider from '../../MailTemplateProvider/models/IMailTemplateProvider';
+import ISendMailDTO from '../dtos/ISendMailDTO';
+import IMailProvider from '../models/IMailProvider';
 
 @injectable()
 export default class SefinMailProvider implements IMailProvider {

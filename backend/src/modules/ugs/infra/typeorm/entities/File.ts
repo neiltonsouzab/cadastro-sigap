@@ -6,6 +6,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+
 import UgRegistration from './UgRegistration';
 
 @Entity('files')

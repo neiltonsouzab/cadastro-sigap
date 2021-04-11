@@ -1,11 +1,10 @@
+import mailConfig from '@config/mail';
 import nodemailer, { Transporter } from 'nodemailer';
 import { inject, injectable } from 'tsyringe';
 
-import mailConfig from '@config/mail';
-
+import IMailTemplateProvider from '../../MailTemplateProvider/models/IMailTemplateProvider';
 import ISendMailDTO from '../dtos/ISendMailDTO';
 import IMailProvider from '../models/IMailProvider';
-import IMailTemplateProvider from '../../MailTemplateProvider/models/IMailTemplateProvider';
 
 @injectable()
 export default class EtherealMailProvider implements IMailProvider {

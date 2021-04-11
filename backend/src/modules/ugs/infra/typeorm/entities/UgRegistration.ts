@@ -1,3 +1,4 @@
+import User from '@modules/users/infra/typeorm/entities/User';
 import {
   Column,
   CreateDateColumn,
@@ -9,9 +10,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import User from '@modules/users/infra/typeorm/entities/User';
-import Ug from './Ug';
 import File from './File';
+import Ug from './Ug';
 
 @Entity('ugs_registrations')
 class UgRegistration {

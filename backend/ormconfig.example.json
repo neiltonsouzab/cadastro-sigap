@@ -8,10 +8,12 @@
     "password": "",
     "database": "cadastro-sigap",
     "entities": [
-      "./src/modules/**/infra/typeorm/entities/*.ts"
+      "./src/modules/**/infra/typeorm/entities/*.ts",
+      "./dist/modules/**/infra/typeorm/entities/*.js"
     ],
     "migrations": [
-      "./src/shared/infra/typeorm/migrations/*.ts"
+      "./src/shared/infra/typeorm/migrations/*.ts",
+      "./dist/modules/**/infra/typeorm/migrations/*.js"
     ],
     "cli": {
       "migrationsDir": "./src/shared/infra/typeorm/migrations"

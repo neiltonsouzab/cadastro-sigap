@@ -1,3 +1,5 @@
+import Ug from '@modules/ugs/infra/typeorm/entities/Ug';
+import { Exclude } from 'class-transformer';
 import {
   Column,
   CreateDateColumn,
@@ -7,9 +9,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Exclude } from 'class-transformer';
-
-import Ug from '@modules/ugs/infra/typeorm/entities/Ug';
 
 @Entity('users')
 class User {

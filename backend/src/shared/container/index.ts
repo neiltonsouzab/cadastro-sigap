@@ -1,19 +1,15 @@
-import { container } from 'tsyringe';
-
-import '@modules/users/providers';
 import './providers';
+import '@modules/users/providers';
 
-import IUgsRepository from '@modules/ugs/repositories/IUgsRepository';
-import UgsRepository from '@modules/ugs/infra/typeorm/repositories/UgsRepository';
-
-import IUgsRegistrationsRepository from '@modules/ugs/repositories/IUgsRegistrationsRepository';
 import UgsRegistrationsRepository from '@modules/ugs/infra/typeorm/repositories/UgsRegistrationsRepository';
-
-import IUsersRepository from '@modules/users/repositories/IUsersRepository';
+import UgsRepository from '@modules/ugs/infra/typeorm/repositories/UgsRepository';
+import IUgsRegistrationsRepository from '@modules/ugs/repositories/IUgsRegistrationsRepository';
+import IUgsRepository from '@modules/ugs/repositories/IUgsRepository';
 import UsersRepository from '@modules/users/infra/typeorm/repositories/UsersRepository';
-
-import IUsersTokensRepository from '@modules/users/repositories/IUsersTokensRepository';
 import UsersTokenRepository from '@modules/users/infra/typeorm/repositories/UsersTokensRepository';
+import IUsersRepository from '@modules/users/repositories/IUsersRepository';
+import IUsersTokensRepository from '@modules/users/repositories/IUsersTokensRepository';
+import { container } from 'tsyringe';
 
 container.registerSingleton<IUgsRepository>('UgsRepository', UgsRepository);
 

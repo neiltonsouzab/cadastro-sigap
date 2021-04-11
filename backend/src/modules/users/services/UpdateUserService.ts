@@ -1,7 +1,8 @@
+import Ug from '@modules/ugs/infra/typeorm/entities/Ug';
 import { inject, injectable } from 'tsyringe';
 
 import AppError from '@shared/errors/AppError';
-import Ug from '@modules/ugs/infra/typeorm/entities/Ug';
+
 import User from '../infra/typeorm/entities/User';
 import IUsersRepository from '../repositories/IUsersRepository';
 

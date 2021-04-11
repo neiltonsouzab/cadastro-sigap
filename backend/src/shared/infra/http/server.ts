@@ -2,22 +2,24 @@ import 'reflect-metadata';
 import 'dotenv/config';
 
 import express from 'express';
-import path from 'path';
 import cors from 'cors';
-import { errors as celebrateErrors } from 'celebrate';
+import path from 'path';
 import 'express-async-errors';
+
+import errors from '../../errors'; // Error interceptor
+import routes from './routes'; // Routes
 
 import '@shared/infra/typeorm'; // DB config
 import '@shared/container'; // DI config
-
-import routes from './routes'; // Routes
-import errors from '../../errors'; // Error interceptor
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-app.use('/files', express.static(path.resolve(__dirname, '..', '..', '..', '..', 'uploads')));
+app.use(
+  '/files',
+  express.static(path.resolve(__dirname, '..', '..', '..', '..', 'uploads')),
+);
 app.use(routes);
 app.use(errors);
 
